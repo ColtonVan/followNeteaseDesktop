@@ -1,0 +1,12 @@
+@import "./variable";
+body,
+html {
+    margin: 0;
+    padding: 0;
+}
+// 鼠标样式
+@each $item in $cursors {
+    .cursor-#{$item} {
+        cursor: #{$item};
+    }
+}
