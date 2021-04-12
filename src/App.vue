@@ -6,6 +6,7 @@
 <script lang="ts">
 import { computed, reactive, toRefs } from "vue";
 import { useStore } from "vuex";
+import "@/utils/request";
 export default {
     setup() {
         const store = useStore();
