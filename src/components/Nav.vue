@@ -1,28 +1,65 @@
 <template>
     <div class="nav d-flex justify-content-between align-items-center">
         <div class="leftArea"></div>
-        <div class="rightArea mx-3">
-            <SkinIcon width="18" height="18" />
+        <div class="rightArea d-flex mx-3">
+            <SkinIcon width="18" height="18" @click.stop="themePanelVisible = !themePanelVisible" />
+            <ThemePanel @click.stop v-if="themePanelVisible" />
             <EmailIcon width="18" height="18" />
+            <div class="border-end ms-3 opacity-50"></div>
             <FullScreenIsTrueIcon v-if="isFullScreen" @click="toggleFullScreen" width="18" height="18" />
             <FullScreenIsFalseIcon v-else @click="toggleFullScreen" width="18" height="18" />
-            <CloseIcon width="18" height="18" />
+            <CloseIcon @click="handleCloseWindow" width="18" height="18" />
         </div>
     </div>
+    <CommonModal
+        title="关闭提示"
+        v-model:visible="modalVisible"
+        bodyClass="text-center"
+        @confirm="
+            window.opener = null;
+            window.open('', '_self');
+            window.close();
+        "
+    >
+        <div class="closeTips" v-html="closeTipsText" />
+    </CommonModal>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from "vue";
+import { computed, defineComponent, reactive, toRefs } from "vue";
 import useFullScrenn from "@/hooks/useFullScreen";
+import useClickDocument from "@/hooks/useClickDocument";
 import { useStore } from "vuex";
 export default defineComponent({
     setup() {
         const store = useStore();
         let { toggleFullScreen } = useFullScrenn();
-        const isFullScreen = computed(() => store.state.fullScreen);
+        const state = reactive({
+            isFullScreen: computed(() => store.state.fullScreen),
+            themePanelVisible: false,
+            modalVisible: false,
+            closeTipsText: "",
+        });
+        useClickDocument(() => {
+            state.themePanelVisible = false;
+        });
+        const handleCloseWindow = () => {
+            state.modalVisible = true;
+            if (window.navigator.userAgent.includes("Firefox")) {
+                state.closeTipsText =
+                    "<div>火狐不支持脚本直接关闭,若要关闭请根据如下设置：</div>" +
+                    "<ul style='list-style: decimal;'><li>在Firefox输入网址栏中输入about:config，然后按键盘Enter进入</li>" +
+                    "<li>页面显示可能使质量保证失效。我们点击：我保证小心。</li>" +
+                    "<li>在搜索栏中搜索dom.allow_scripts_to_close_windows，找到相关的设置，右击点击切换，把选项从“false”转为“ture”</li>";
+            } else {
+                state.closeTipsText = "确定要关闭吗?";
+            }
+        };
         return {
             toggleFullScreen,
-            isFullScreen,
+            handleCloseWindow,
+            window,
+            ...toRefs(state),
         };
     },
 });
@@ -32,7 +69,11 @@ export default defineComponent({
 .nav {
     height: 60px;
     width: 100vw;
+    flex-shrink: 0;
     .rightArea {
+        position: relative;
+        /* margin-right: 200px !important; */
+        flex-shrink: 0;
         svg {
             opacity: 0.86;
             @extend .cursor-pointer;
@@ -45,13 +86,31 @@ export default defineComponent({
         }
     }
 }
+.closeTips {
+    color: rgb(112, 112, 112);
+    font-size: 14px;
+    line-height: 2;
+    @extend .canSelect;
+    ::v-deep > div:first-child {
+        font-weight: bold;
+    }
+    ::v-deep > ul {
+        text-align: left;
+    }
+}
 .primaryTheme {
     .nav {
         background-color: $primary;
     }
 }
 .darkTheme {
+    .nav {
+        background-color: $dark;
+    }
 }
-.whiteTheme {
+.freeTheme {
+    .nav {
+        background-color: $free;
+    }
 }
 </style>

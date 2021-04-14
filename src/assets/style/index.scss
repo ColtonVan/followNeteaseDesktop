@@ -3,6 +3,23 @@ body,
 html {
     margin: 0;
     padding: 0;
+    @extend .cantSelect;
+}
+.canSelect {
+    -webkit-touch-callout: text; /* iOS Safari */
+    -webkit-user-select: text; /* Chrome/Safari/Opera */
+    -khtml-user-select: text; /* Konqueror */
+    -moz-user-select: text; /* Firefox */
+    -ms-user-select: text; /* Internet Explorer/Edge */
+    user-select: text; /* Non-prefixed version, currently not supported by any browser */
+}
+.cantSelect {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Chrome/Safari/Opera */
+    -khtml-user-select: none; /* Konqueror */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently not supported by any browser */
 }
 // 鼠标样式
 @each $item in $cursors {
@@ -10,3 +27,20 @@ html {
         cursor: #{$item};
     }
 }
+@each $key, $val in $colors {
+    .bg-#{$key} {
+        background-color: #{$val};
+    }
+}
+$utilities: (
+    "opacity": (
+        property: opacity,
+        values: (
+            0: 0,
+            25: 0.25,
+            50: 0.5,
+            75: 0.75,
+            100: 1,
+        ),
+    ),
+);

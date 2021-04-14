@@ -1,12 +1,19 @@
 import { createStore } from 'vuex'
 
-export default createStore({
+const store = createStore({
 	state: {
 		theme: "primaryTheme",
 		fullScreen: false
 	},
+	getters: {
+		getTheme(state) {
+			return state.theme;
+		}
+	},
 	mutations: {
 		changeTheme(state, val) {
+			//主题持久化-设置
+			localStorage["theme"] = val;
 			state.theme = val;
 		},
 		changeFullScreen(state, val) {
@@ -18,3 +25,9 @@ export default createStore({
 	modules: {
 	}
 })
+export default store;
+//主题持久化-读取
+let localTheme = localStorage["theme"];
+if (localTheme) {
+	store.commit("changeTheme", localTheme);
+}

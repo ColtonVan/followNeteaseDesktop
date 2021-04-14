@@ -1,2 +1,9 @@
 $primary: #ec4141;
-$cursors: "pointer","cell","col-resize","copy","crosshair","grab";
+$dark: #212529;
+$free: #50c475;
+$colors: (
+    primary: $primary,
+    dark: $dark,
+    free: $free,
+);
+$cursors: "pointer", "cell", "col-resize", "copy", "crosshair", "grab", "move";

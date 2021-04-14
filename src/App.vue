@@ -11,7 +11,7 @@ export default {
     setup() {
         const store = useStore();
         const state = reactive({
-            theme: computed(() => store.state.theme),
+            theme: computed(() => store.getters.getTheme),
             allowTheme: true,
         });
         return {
@@ -22,5 +22,6 @@ export default {
 </script>
 <style lang="scss">
 .app {
+    position: relative;
 }
 </style>
