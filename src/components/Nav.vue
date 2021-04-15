@@ -1,12 +1,17 @@
 <template>
     <div class="nav d-flex justify-content-between align-items-center">
         <div class="leftArea"></div>
-        <div class="rightArea d-flex mx-3">
-            <SkinIcon width="18" height="18" @click.stop="themePanelVisible = !themePanelVisible" />
+        <div class="rightArea d-flex align-items-center mx-3">
+            <span class="cursor-pointer">
+                <NotLoginIcon width="28" height="28" />
+                <span class="text-white ms-3 fs-6">未登录</span>
+                <DownArrowIcon class="ms-2" width="12" height="12"/>
+            </span>
+            <SkinIcon class="ms-5" width="18" height="18" @click.stop="themePanelVisible = !themePanelVisible" />
             <ThemePanel @click.stop v-if="themePanelVisible" />
             <EmailIcon width="18" height="18" />
-            <div class="border-end ms-3 opacity-50"></div>
-            <ToHomeIcon width="18" height="18" />
+            <div class="border-end ms-4 opacity-50" style="height:16px;"></div>
+            <ToHomeIcon width="19" height="19" />
             <FullScreenIsTrueIcon v-if="isFullScreen" @click="toggleFullScreen" width="18" height="18" />
             <FullScreenIsFalseIcon v-else @click="toggleFullScreen" width="18" height="18" />
             <CloseIcon @click="handleCloseWindow" width="16" height="16" />
