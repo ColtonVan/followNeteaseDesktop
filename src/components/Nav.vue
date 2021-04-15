@@ -6,9 +6,10 @@
             <ThemePanel @click.stop v-if="themePanelVisible" />
             <EmailIcon width="18" height="18" />
             <div class="border-end ms-3 opacity-50"></div>
+            <ToHomeIcon width="18" height="18" />
             <FullScreenIsTrueIcon v-if="isFullScreen" @click="toggleFullScreen" width="18" height="18" />
             <FullScreenIsFalseIcon v-else @click="toggleFullScreen" width="18" height="18" />
-            <CloseIcon @click="handleCloseWindow" width="18" height="18" />
+            <CloseIcon @click="handleCloseWindow" width="16" height="16" />
         </div>
     </div>
     <CommonModal
