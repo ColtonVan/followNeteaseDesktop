@@ -12,5 +12,6 @@ module.exports = {
                 prependData: `@import "@/assets/style/index.scss";@import "@/assets/style/_variable.scss";`,
             },
         },
-    }
+    },
+    publicPath:'./'
 }
