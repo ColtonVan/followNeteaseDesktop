@@ -12,7 +12,19 @@
         <path
             d="M511.997952 755.974268l365.02634-487.950584L146.975708 268.023684 511.997952 755.974268"
             p-id="6922"
-            fill="#ffffff"
+            :fill="color"
         ></path>
     </svg>
 </template>
+<script>
+import { defineComponent } from "vue";
+
+export default defineComponent({
+    props: {
+        color: {
+            type: String,
+            default: "#ffffff",
+        },
+    },
+});
+</script>

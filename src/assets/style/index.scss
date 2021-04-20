@@ -6,6 +6,10 @@ html {
     font-size: 12px;
     @extend .cantSelect;
 }
+a {
+    color: #0c73c2;
+    text-decoration: none;
+}
 .canSelect {
     -webkit-touch-callout: text; /* iOS Safari */
     -webkit-user-select: text; /* Chrome/Safari/Opera */
@@ -21,6 +25,12 @@ html {
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* Internet Explorer/Edge */
     user-select: none; /* Non-prefixed version, currently not supported by any browser */
+}
+.hover-opacity {
+    opacity: 0.86;
+    &:hover {
+        opacity: 1;
+    }
 }
 // 鼠标样式
 @each $item in $cursors {
@@ -42,6 +52,16 @@ $utilities: (
             50: 0.5,
             75: 0.75,
             100: 1,
+        ),
+    ),
+    "viewport-width": (
+        property: width,
+        class: vw,
+        values: (
+            25: 25vw,
+            50: 50vw,
+            75: 75vw,
+            100: 100vw,
         ),
     ),
 );

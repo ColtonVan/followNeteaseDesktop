@@ -1,4 +1,8 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+export interface AxiosResponseProps{
+    code?: number;
+    data?: any;
+}
 const axiosIns: AxiosInstance = axios.create({
     baseURL: process.env.VUE_APP_baseURL,
     withCredentials: true

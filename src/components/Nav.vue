@@ -1,15 +1,33 @@
 <template>
-    <div class="nav d-flex justify-content-between align-items-center">
-        <div class="leftArea"></div>
+    <div @click="clickNav" class="nav d-flex justify-content-between align-items-center">
+        <div class="leftArea">
+            <div class="logo ms-4 cursor-pointer"></div>
+        </div>
         <div class="rightArea d-flex align-items-center mx-3">
-            <span class="cursor-pointer">
+            <span
+                v-if="userInfo && userInfo.nickname"
+                @click.stop="userInfoModalVisible = !userInfoModalVisible"
+                class="position-relative"
+            >
+                <img :src="userInfo.avatarUrl" class="rounded-circle cursor-pointer" width="28" alt="" />
+                <span class="hover-opacity text-white ms-3 fs-6 cursor-pointer">{{ userInfo.nickname }}</span>
+                <DownArrowIcon class="ms-2 hover-opacity cursor-pointer" width="12" height="12" />
+                <UserInfoModal v-model:visible="userInfoModalVisible" />
+            </span>
+            <span
+                v-else
+                @click="loginModalVisible = !loginModalVisible"
+                class="cursor-pointer hover-opacity position-relative"
+            >
                 <NotLoginIcon width="28" height="28" />
                 <span class="text-white ms-3 fs-6">未登录</span>
-                <DownArrowIcon class="ms-2" width="12" height="12"/>
+                <DownArrowIcon class="ms-2" width="12" height="12" />
             </span>
-            <SkinIcon class="ms-5" width="18" height="18" @click.stop="themePanelVisible = !themePanelVisible" />
-            <ThemePanel @click.stop v-if="themePanelVisible" />
-            <EmailIcon width="18" height="18" />
+            <span class="position-relative">
+                <SkinIcon class="ms-5" width="18" height="18" @click.stop="themePanelVisible = !themePanelVisible" />
+                <ThemePanel @click.stop v-if="themePanelVisible" />
+            </span>
+            <EmailIcon class="ms-4" width="18" height="18" />
             <div class="border-end ms-4 opacity-50" style="height:16px;"></div>
             <ToHomeIcon width="19" height="19" />
             <FullScreenIsTrueIcon v-if="isFullScreen" @click="toggleFullScreen" width="18" height="18" />
@@ -17,9 +35,10 @@
             <CloseIcon @click="handleCloseWindow" width="16" height="16" />
         </div>
     </div>
+    <LoginModal v-model:visible="loginModalVisible" />
     <CommonModal
         title="关闭提示"
-        v-model:visible="modalVisible"
+        v-model:visible="closeModalVisible"
         bodyClass="text-center"
         @confirm="
             window.opener = null;
@@ -43,14 +62,19 @@ export default defineComponent({
         const state = reactive({
             isFullScreen: computed(() => store.state.fullScreen),
             themePanelVisible: false,
-            modalVisible: false,
+            closeModalVisible: false,
+            loginModalVisible: false,
+            userInfoModalVisible: false,
             closeTipsText: "",
+            userInfo: computed(() => store.state.userInfo),
         });
+        store.dispatch("getUserInfo");
         useClickDocument(() => {
             state.themePanelVisible = false;
+            state.userInfoModalVisible = false;
         });
         const handleCloseWindow = () => {
-            state.modalVisible = true;
+            state.closeModalVisible = true;
             if (window.navigator.userAgent.includes("Firefox")) {
                 state.closeTipsText =
                     "<div>火狐不支持脚本直接关闭,若要关闭请根据如下设置：</div>" +
@@ -61,9 +85,20 @@ export default defineComponent({
                 state.closeTipsText = "确定要关闭吗?";
             }
         };
+        let clickedArr: number[] = [];
+        const clickNav = () => {
+            if (clickedArr.length === 2) {
+                clickedArr.splice(0, 1);
+            }
+            clickedArr.push(Date.now());
+            if (clickedArr[1] - clickedArr[0] < 500) {
+                toggleFullScreen();
+            }
+        };
         return {
             toggleFullScreen,
             handleCloseWindow,
+            clickNav,
             window,
             ...toRefs(state),
         };
@@ -76,6 +111,16 @@ export default defineComponent({
     height: 60px;
     width: 100vw;
     flex-shrink: 0;
+    .leftArea {
+        .logo {
+            background-image: url(../assets/img/topbar.png);
+            background-repeat: no-repeat;
+            background-position: 0 -12.5px;
+            width: 170px;
+            height: 45px;
+            transform: scale(0.88);
+        }
+    }
     .rightArea {
         position: relative;
         /* margin-right: 200px !important; */

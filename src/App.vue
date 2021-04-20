@@ -1,6 +1,10 @@
 <template>
-    <div class="app" :class="{ [theme]: allowTheme }">
+    <div class="app vh-100" :class="{ [theme]: allowTheme }">
         <Nav />
+        <div class="d-flex">
+            <LeftSideBar />
+        </div>
+        <PlayBar />
     </div>
 </template>
 <script lang="ts">

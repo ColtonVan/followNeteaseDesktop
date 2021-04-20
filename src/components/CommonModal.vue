@@ -1,6 +1,6 @@
 <template>
     <teleport to=".app" v-if="modalVisible && canRender">
-        <div ref="modalRef" class="CommonModal d-flex flex-column align-items-center">
+        <div ref="modalRef" class="CommonModal d-flex flex-column align-items-center bg-white">
             <div @mousedown="handleMouseDown" class="cursor-move title d-flex justify-content-center align-items-end">
                 <div>{{ title }}</div>
                 <CloseIcon @click="modalVisible = false" class="cursor-pointer" width="20px" height="20px" />
@@ -128,6 +128,7 @@ export default defineComponent({
 <style scoped lang="scss">
 .CommonModal {
     position: fixed;
+    z-index: 999;
     top: 50vh;
     left: 50vw;
     transform: translate(-50%, -50%);
