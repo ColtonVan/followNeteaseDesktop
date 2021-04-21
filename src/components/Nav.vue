@@ -1,16 +1,24 @@
 <template>
-    <div @click="clickNav" class="nav d-flex justify-content-between align-items-center">
+    <div @click.self="clickNav" class="nav d-flex justify-content-between align-items-center">
         <div class="leftArea">
             <div class="logo ms-4 cursor-pointer"></div>
         </div>
         <div class="rightArea d-flex align-items-center mx-3">
-            <span v-if="userInfo && userInfo.nickname" @click.stop="userInfoModalVisible = !userInfoModalVisible" class="position-relative">
+            <span
+                v-if="userInfo && userInfo.nickname"
+                @click.stop="userInfoModalVisible = !userInfoModalVisible"
+                class="position-relative"
+            >
                 <img :src="userInfo.avatarUrl" class="rounded-circle cursor-pointer" width="28" alt="" />
                 <span class="hover-opacity text-white ms-3 fs-6 cursor-pointer">{{ userInfo.nickname }}</span>
                 <DownArrowIcon class="ms-2 hover-opacity cursor-pointer" width="12" height="12" />
                 <UserInfoModal v-model:visible="userInfoModalVisible" />
             </span>
-            <span v-else @click="loginModalVisible = !loginModalVisible" class="cursor-pointer hover-opacity position-relative">
+            <span
+                v-else
+                @click="loginModalVisible = !loginModalVisible"
+                class="cursor-pointer hover-opacity position-relative"
+            >
                 <NotLoginIcon width="28" height="28" />
                 <span class="text-white ms-3 fs-6">未登录</span>
                 <DownArrowIcon class="ms-2" width="12" height="12" />

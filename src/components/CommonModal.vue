@@ -1,5 +1,5 @@
 <template>
-    <teleport to=".app" v-if="modalVisible && canRender">
+    <teleport to=".main" v-if="modalVisible && canRender">
         <div ref="modalRef" class="CommonModal d-flex flex-column align-items-center bg-white">
             <div @mousedown="handleMouseDown" class="cursor-move title d-flex justify-content-center align-items-end">
                 <div>{{ title }}</div>
@@ -9,7 +9,10 @@
                 <div class="main" :style="bodyStyle" :class="bodyClass">
                     <slot name="default" />
                 </div>
-                <div @click="$emit('confirm')" class="okBtn cursor-pointer d-flex justify-content-center align-items-center">
+                <div
+                    @click="$emit('confirm')"
+                    class="okBtn cursor-pointer d-flex justify-content-center align-items-center"
+                >
                     {{ okText }}
                 </div>
             </div>
@@ -18,8 +21,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, ref, toRefs } from "vue";
+import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from "vue";
 export default defineComponent({
+    emits: ["update:visible", "confirm"],
     props: {
         visible: {
             type: Boolean,

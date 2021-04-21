@@ -49,6 +49,7 @@ export default defineComponent({
     box-shadow: 0 0 3.5px 2.5px rgba($color: #000000, $alpha: 0.075);
     border-radius: 7px;
     font-size: 12px;
+    z-index: 996;
     .nav {
         width: 100%;
         height: 20px;

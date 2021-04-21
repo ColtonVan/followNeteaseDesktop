@@ -1,5 +1,5 @@
 <template>
-    <div class="leftSideBar border-end ps-3 pe-1 pt-2 fs-5">
+    <div class="leftSideBar border-end ps-3 pe-1 pt-2 fs-5 flex-shrink-0">
         <div
             class="mt-1 p-2 cursor-pointer rounded hover-menuItem"
             :class="{ visitedMenu: menu1.active, 'fw-bold': menu1.active }"
