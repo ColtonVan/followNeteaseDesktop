@@ -19,13 +19,7 @@
         </div>
         <div @click="collapsed = !collapsed" class="hover-arrow cursor-pointer text-black-50 fs-6 ps-2 py-3">
             <span class="me-2">我喜欢的音乐</span>
-            <DownArrowIcon
-                :class="{ collapsed }"
-                class="downArrow"
-                color="rgba(0, 0, 0, 0.5)"
-                width="10px"
-                height="10px"
-            />
+            <DownArrowIcon :class="{ collapsed }" class="downArrow" color="rgba(0, 0, 0, 0.5)" width="10px" height="10px" />
         </div>
         <div v-if="!collapsed">
             <div
@@ -67,6 +61,7 @@ export default defineComponent({
                 {
                     title: "发现音乐",
                     key: "fxyy",
+                    active: true,
                 },
                 {
                     title: "视频",

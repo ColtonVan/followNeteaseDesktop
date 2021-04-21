@@ -1,4 +1,7 @@
 @import "./variable";
+@import "bootstrap/scss/_functions";
+@import "bootstrap/scss/_variables";
+@import "bootstrap/scss/_utilities";
 body,
 html {
     margin: 0;
@@ -63,5 +66,23 @@ $utilities: (
             75: 75vw,
             100: 100vw,
         ),
+    ),
+    "rounded": (
+      property: border-radius,
+      class: rounded,
+      values: (
+        null: $border-radius,
+        0: 0,
+        1: $border-radius-sm,
+        2: $border-radius,
+        3: $border-radius-lg,
+        4: 0.4rem,
+        5: 0.5rem,
+        6: 0.6rem,
+        7: 0.7rem,
+        8: 0.8rem,
+        circle: 50%,
+        pill: $border-radius-pill
+      )
     ),
 );

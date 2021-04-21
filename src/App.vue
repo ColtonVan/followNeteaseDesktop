@@ -1,31 +1,18 @@
 <template>
-    <div class="app vh-100" :class="{ [theme]: allowTheme }">
-        <Nav />
-        <div class="d-flex">
-            <LeftSideBar />
-        </div>
-        <PlayBar />
-    </div>
+    <router-view></router-view>
 </template>
+
 <script lang="ts">
-import { computed, reactive, toRefs } from "vue";
-import { useStore } from "vuex";
-import "@/utils/request";
-export default {
-    setup() {
-        const store = useStore();
-        const state = reactive({
-            theme: computed(() => store.getters.getTheme),
-            allowTheme: true,
-        });
-        return {
-            ...toRefs(state),
-        };
+import { defineComponent } from "vue";
+import Main from "@/layout/Main.vue";
+export default defineComponent({
+    components: {
+        Main,
     },
-};
+    setup() {
+
+    },
+});
 </script>
-<style lang="scss">
-.app {
-    position: relative;
-}
-</style>
+
+<style scoped lang="scss"></style>

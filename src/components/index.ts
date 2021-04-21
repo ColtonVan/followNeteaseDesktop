@@ -1,5 +1,5 @@
 import { App } from "vue";
-const context = require.context("@/components", true, /.vue$/);
+const context = require.context("@/components", true, /.vue$/)
 export default {
     install(app: App) {
         context.keys().forEach(componentPath => {

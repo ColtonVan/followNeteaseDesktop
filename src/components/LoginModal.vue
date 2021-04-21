@@ -107,6 +107,7 @@ export default defineComponent({
     top: 10vh;
     transform: translateX(-50%);
     z-index: 998;
+    background-color: #fff;
     > svg:first-child {
         position: absolute;
         top: 9px;

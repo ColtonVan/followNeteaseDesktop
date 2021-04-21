@@ -93,6 +93,8 @@ export default defineComponent({
     width: 285px;
     height: 378px;
     top: 44px;
+    z-index: 997;
+    background-color: #fff;
     .lineHover {
         &:hover {
             background-color: rgba(#000, 0.05);
