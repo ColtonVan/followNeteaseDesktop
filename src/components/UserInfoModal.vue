@@ -24,7 +24,12 @@
                 </div>
             </div>
         </div>
+        <div v-if="userDetail.pcSign" class="SignInBox mb-3 text-center border rounded-pill px-3 py-1 fs-5 d-flex align-item-center">
+            <span class="text-black-50">已签到</span>
+        </div>
         <div
+            v-else
+            @click="handlePcSign"
             class="SignInBox lineHover mb-3 cursor-pointer text-center border rounded-pill px-3 py-1 fs-5 d-flex align-item-center"
         >
             <SignInIcon class="me-1" width="20px" height="20px" />
@@ -40,19 +45,18 @@
             <ArrowRightIcon class="opacity-75" width="15px" height="15px" />
         </div>
         <div class="splitLine w-100 border-bottom my-1"></div>
-        <div
-            @click="handleLogout"
-            class="lineHover cursor-pointer w-100 px-4 py-3 d-flex justify-content-between align-items-center"
-        >
+        <div @click="handleLogout" class="lineHover cursor-pointer w-100 px-4 py-3 d-flex justify-content-between align-items-center">
             <div><LogoutIcon width="20px" height="20px" class="me-2" /><span>退出登录</span></div>
         </div>
     </div>
+    <CommonToast ref="commonToast" />
 </template>
 
 <script lang="ts">
 import { useStore } from "vuex";
-import { computed, defineComponent, reactive, toRefs, watch } from "vue";
-
+import { computed, defineComponent, reactive, ref, toRefs, watch } from "vue";
+import { dailySignin, getAccountInfo } from "@/api/login";
+import { AxiosResponseProps } from "@/utils/request";
 export default defineComponent({
     props: {
         visible: {
@@ -76,13 +80,24 @@ export default defineComponent({
                 get: () => props.visible,
                 set: newV => emit("update:visible", newV),
             }),
+            commonToast: ref(null),
         });
         const handleLogout = () => {
             store.dispatch("logout");
         };
+        const handlePcSign = () => {
+            dailySignin().then((res: any) => {
+                if (res.code === 200) {
+                    store.dispatch("getUserDetail").then(() => {
+                        state.commonToast.success(`签到成功，积分加${res.point}`);
+                    })
+                }
+            });
+        };
         return {
             ...toRefs(state),
             handleLogout,
+            handlePcSign,
         };
     },
 });

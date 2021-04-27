@@ -1,19 +1,19 @@
 <template>
     <teleport to=".main" v-if="modalVisible && canRender">
         <div ref="modalRef" class="CommonModal d-flex flex-column align-items-center bg-white">
-            <div @mousedown="handleMouseDown" class="cursor-move title d-flex justify-content-center align-items-end">
-                <div>{{ title }}</div>
+            <div ref="dragRef" class="cursor-move title d-flex justify-content-center align-items-end">
+                <div class="fs-5">{{ title }}</div>
                 <CloseIcon @click="modalVisible = false" class="cursor-pointer" width="20px" height="20px" />
             </div>
             <div class="content">
                 <div class="main" :style="bodyStyle" :class="bodyClass">
                     <slot name="default" />
                 </div>
-                <div
-                    @click="$emit('confirm')"
-                    class="okBtn cursor-pointer d-flex justify-content-center align-items-center"
-                >
-                    {{ okText }}
+                <div>
+                    <slot v-if="$slots.buttons" name="buttons" />
+                    <div v-else @click="$emit('confirm')" class="okBtn cursor-pointer d-flex justify-content-center align-items-center">
+                        {{ okText }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -22,6 +22,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from "vue";
+import useDragMove from "@/hooks/useDragMove";
 export default defineComponent({
     emits: ["update:visible", "confirm"],
     props: {
@@ -52,78 +53,25 @@ export default defineComponent({
                 get: () => props.visible,
                 set: newV => context.emit("update:visible", newV),
             }),
-            modalRef: ref<null | HTMLDivElement>(null),
             canRender: false,
         });
-        let startClientX = 0;
-        let startClientY = 0;
-        let startOffsetLeft = 0;
-        let startOffsetTop = 0;
-        let canDrag = false;
-        let modalDom: HTMLDivElement;
+        const modalRef = ref(null);
+        const dragRef = ref(null);
         onMounted(() => {
             state.canRender = true; //teleport标签必须检测到to指定的元素已经存在才能渲染
         });
-        const getWindowWidth = () => {
-            //获取窗口宽度
-            if (window.innerWidth) {
-                //兼容DOM
-                return window.innerWidth;
-            } else if (document.body && document.body.clientWidth) {
-                //兼容IE
-                return document.body.clientWidth;
+        watch(
+            () => state.modalVisible,
+            newV => {
+                if (newV) {
+                    useDragMove(modalRef, dragRef);
+                }
             }
-            return 0;
-        };
-        const getWindowHeight = () => {
-            //获取窗口高度
-            if (window.innerHeight) {
-                //兼容DOM
-                return window.innerHeight;
-            } else if (document.body && document.body.clientHeight) {
-                //兼容IE
-                return document.body.clientHeight;
-            }
-            return 0;
-        };
-        const handleMouseDown = (e: MouseEvent) => {
-            canDrag = true;
-            modalDom = state.modalRef as HTMLDivElement;
-            startClientX = e.clientX;
-            startClientY = e.clientY;
-            startOffsetLeft = modalDom.offsetLeft;
-            startOffsetTop = modalDom.offsetTop;
-        };
-        const handleMouseMove = (e: MouseEvent) => {
-            if (canDrag) {
-                let difX = e.clientX - startClientX;
-                let difY = e.clientY - startClientY;
-                let currentLeft = difX + startOffsetLeft;
-                let currentTop = difY + startOffsetTop;
-                if (currentLeft - modalDom.offsetWidth / 2 < 0) {
-                    currentLeft = modalDom.offsetWidth / 2;
-                }
-                if (currentTop - modalDom.offsetHeight / 2 < 0) {
-                    currentTop = modalDom.offsetHeight / 2;
-                }
-                if (currentLeft + modalDom.offsetWidth - modalDom.offsetWidth / 2 > getWindowWidth()) {
-                    currentLeft = getWindowWidth() - modalDom.offsetWidth + modalDom.offsetWidth / 2;
-                }
-                if (currentTop + modalDom.offsetHeight - modalDom.offsetHeight / 2 > getWindowHeight()) {
-                    currentTop = getWindowHeight() - modalDom.offsetHeight + modalDom.offsetHeight / 2;
-                }
-                modalDom.style.left = currentLeft + "px";
-                modalDom.style.top = currentTop + "px";
-            }
-        };
-        const handleMouseUp = (e: MouseEvent) => {
-            canDrag = false;
-        };
-        window.addEventListener("mousemove", handleMouseMove);
-        window.addEventListener("mouseup", handleMouseUp);
+        );
         return {
             ...toRefs(state),
-            handleMouseDown,
+            modalRef,
+            dragRef,
         };
     },
 });
@@ -146,7 +94,7 @@ export default defineComponent({
         font-weight: bold;
         width: 100%;
         height: 80px;
-        padding-bottom: 16px;
+        padding-bottom: 22px;
         position: relative;
         > svg {
             position: absolute;

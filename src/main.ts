@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import components from "@/components"
+import components from "@/plugins/components"
 import "bootstrap/scss/bootstrap.scss"
 
-createApp(App).use(store).use(router).use(components).mount('#app')
+createApp(App).use(router).use(components).use(store).mount('#app')

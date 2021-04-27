@@ -1,11 +1,12 @@
 <template>
-    <div class="main vh-100" :class="{ [theme]: allowTheme }">
+    <div class="main vw-100 vh-100 position-relative" :class="{ [theme]: allowTheme }">
         <Nav />
         <div class="d-flex">
             <LeftSideBar />
             <Container />
         </div>
         <PlayBar />
+        <RequestLoading />
     </div>
 </template>
 <script lang="ts">

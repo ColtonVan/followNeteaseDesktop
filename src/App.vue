@@ -9,9 +9,7 @@ export default defineComponent({
     components: {
         Main,
     },
-    setup() {
-
-    },
+    setup() {},
 });
 </script>
 

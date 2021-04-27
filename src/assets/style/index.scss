@@ -30,15 +30,27 @@ a {
     user-select: none; /* Non-prefixed version, currently not supported by any browser */
 }
 .hover-opacity {
+    cursor: pointer;
     opacity: 0.86;
     &:hover {
-        opacity: 1;
+        opacity: 1!important;
     }
 }
 .hideScrollBar {
     &::-webkit-scrollbar {
         display: none;
     }
+}
+.text-ellipsis{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.flex-center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
 }
 // 鼠标样式
 @each $item in $cursors {

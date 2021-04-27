@@ -1,6 +1,6 @@
 <template>
     <teleport to="body" v-if="modalVisible">
-        <div class="loginModal shadow">
+        <div ref="loginModalRef" class="loginModal shadow">
             <CloseIcon @click="modalVisible = false" class="cursor-pointer" width="19px" height="19px" />
             <div class="pt-5 d-flex flex-column align-items-center">
                 <div class="fs-2 mt-3 mb-3 pt-5 text-center">扫码登陆</div>
@@ -33,10 +33,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from "vue";
+import { computed, defineComponent, reactive, ref, toRefs, watch } from "vue";
 import { getQrKey, createLoginQr, checkQrStatus } from "@/api/login";
 import { AxiosResponseProps } from "@/utils/request";
 import { useStore } from "vuex";
+import useDragMove from "@/hooks/useDragMove";
 export default defineComponent({
     props: {
         visible: {
@@ -54,6 +55,7 @@ export default defineComponent({
             qrCode: "",
             qrStatus: 801, //800为二维码过期,801为等待扫码,802为待确认,803为授权登录成功(803状态码下会返回cookies)
         });
+        const loginModalRef = ref(null);
         const operationByGetQr = () => {
             let timer: any = null;
             watch(
@@ -72,6 +74,7 @@ export default defineComponent({
                 () => props.visible,
                 async newV => {
                     if (newV === true) {
+                        useDragMove(loginModalRef);
                         if (timer) {
                             clearInterval(timer);
                         }
@@ -93,6 +96,7 @@ export default defineComponent({
         operationByGetQr();
         return {
             ...toRefs(state),
+            loginModalRef,
         };
     },
 });
@@ -104,8 +108,8 @@ export default defineComponent({
     width: 350px;
     height: 530px;
     left: 50vw;
-    top: 10vh;
-    transform: translateX(-50%);
+    top: 42vh;
+    transform: translate(-50%, -50%);
     z-index: 998;
     background-color: #fff;
     > svg:first-child {

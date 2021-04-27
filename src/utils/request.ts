@@ -1,19 +1,37 @@
+import store from "@/store/index";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 export interface AxiosResponseProps {
     code?: number;
+    status?: number;
     data?: any;
-    // banners?: any[];
 }
 const axiosIns: AxiosInstance = axios.create({
     baseURL: process.env.VUE_APP_baseURL,
-    withCredentials: true
+    withCredentials: true,
 } as AxiosRequestConfig);
 axiosIns.interceptors.request.use((config: AxiosRequestConfig) => {
+    let ignoreLoadingUrls = ["/login/qr/check"];
+    if (!ignoreLoadingUrls.includes(config.url)) {
+        store.commit("changeIsLoading", true);
+    }
+    // if (config.method === "get") {
+    //     if (Object.prototype.toString.call(config.params) === "[object Object]") {
+    //         if (!config.params.timeStamp) {
+    //             config.params.timeStamp = Date.now();
+    //         }
+    //     } else {
+    //         config.params = { timeStamp: Date.now() };
+    //     }
+    // }
     return config;
-})
-axiosIns.interceptors.response.use((resoponse: AxiosResponse<AxiosResponseProps>) => {
-    return resoponse.data as AxiosResponse;
-})
+});
+axiosIns.interceptors.response.use(
+    (resoponse: AxiosResponse<AxiosResponseProps>) => {
+        store.commit("changeIsLoading", false);
+        return resoponse.data as AxiosResponse<AxiosResponseProps>;
+    },
+    err => {
+        return Promise.reject(err);
+    }
+);
 export default axiosIns;
-// axiosIns.get("/login/cellphone", { params: { phone: "17607101164", md5_password: "53270e9ed6bb6eb64b1024d6f4227bcf" } })
-// --------------------------------------------------------

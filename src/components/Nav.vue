@@ -1,24 +1,48 @@
 <template>
-    <div @click.self="clickNav" class="nav d-flex justify-content-between align-items-center">
-        <div class="leftArea">
-            <div class="logo ms-4 cursor-pointer"></div>
+    <div @click.self="clickNav" id="nav" class="nav d-flex w-100 flex-shrink-0 flex-nowrap justify-content-between align-items-center">
+        <div class="leftArea d-flex align-items-center">
+            <div class="logo ms-4 cursor-pointer me-5"></div>
+            <div class="d-flex flex-center ms-5 me-5">
+                <div
+                    @click="routeBack"
+                    class="rounded-circle routerBackIcon me-3 flex-center"
+                    :class="{ cantBack: $store.state.routeFromList.length <= 1 }"
+                    title="向前返回"
+                >
+                    <ArrowLeftIcon title="向前返回" width="11" height="11" />
+                </div>
+                <div
+                    @click="$router.forward()"
+                    class="rounded-circle routerBackIcon flex-center"
+                    :class="{ cantBack: !hasReturned }"
+                    title="向后返回"
+                >
+                    <ArrowRightIcon title="向后返回" width="11" height="11" />
+                </div>
+            </div>
+            <div @click.stop class="flex-center rounded-pill searchBox px-3 position-relative">
+                <SearchIcon width="15" height="15" />
+                <input
+                    placeholder="搜索"
+                    onfocus="this.placeholder=''"
+                    @focus="searchHistoryVisible = true"
+                    @keyup="SearchKeywordKeyup"
+                    v-model="searchKeyword"
+                    onblur="this.placeholder='搜索'"
+                    class="searchInput rounded-pill text-white ms-1"
+                    type="text"
+                />
+                <SearchHistoryPanel v-if="searchHistoryVisible" />
+            </div>
         </div>
         <div class="rightArea d-flex align-items-center mx-3">
-            <span
-                v-if="userInfo && userInfo.nickname"
-                @click.stop="userInfoModalVisible = !userInfoModalVisible"
-                class="position-relative"
-            >
+            <span v-if="userInfo && userInfo.nickname" @click.stop="userInfoModalVisible = !userInfoModalVisible" class="position-relative">
                 <img :src="userInfo.avatarUrl" class="rounded-circle cursor-pointer" width="28" alt="" />
                 <span class="hover-opacity text-white ms-3 fs-6 cursor-pointer">{{ userInfo.nickname }}</span>
                 <DownArrowIcon class="ms-2 hover-opacity cursor-pointer" width="12" height="12" />
                 <UserInfoModal v-model:visible="userInfoModalVisible" />
             </span>
-            <span
-                v-else
-                @click="loginModalVisible = !loginModalVisible"
-                class="cursor-pointer hover-opacity position-relative"
-            >
+            <span v-else @click="loginModalVisible = !loginModalVisible" class="cursor-pointer hover-opacity position-relative">
                 <NotLoginIcon width="28" height="28" />
                 <span class="text-white ms-3 fs-6">未登录</span>
                 <DownArrowIcon class="ms-2" width="12" height="12" />
@@ -29,7 +53,7 @@
             </span>
             <EmailIcon class="ms-4" width="18" height="18" />
             <div class="border-end ms-4 opacity-50" style="height:16px;"></div>
-            <ToHomeIcon width="19" height="19" />
+            <ToHomeIcon @click="$router.push('/')" width="19" height="19" />
             <FullScreenIsTrueIcon v-if="isFullScreen" @click="toggleFullScreen" width="18" height="18" />
             <FullScreenIsFalseIcon v-else @click="toggleFullScreen" width="18" height="18" />
             <CloseIcon @click="handleCloseWindow" width="16" height="16" />
@@ -51,13 +75,16 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from "vue";
+import { computed, defineComponent, reactive, toRefs, watch } from "vue";
 import useFullScrenn from "@/hooks/useFullScreen";
-import useClickDocument from "@/hooks/useClickDocument";
+import useClickDocument, { useClickDom, useClickOnce } from "@/hooks/useClickDocument";
 import { useStore } from "vuex";
+import { useRoute, useRouter } from "vue-router";
+const searchHistoryKey = "searchHistory";
 export default defineComponent({
     setup() {
         const store = useStore();
+        const router = useRouter();
         let { toggleFullScreen } = useFullScrenn();
         const state = reactive({
             isFullScreen: computed(() => store.state.fullScreen),
@@ -65,14 +92,27 @@ export default defineComponent({
             closeModalVisible: false,
             loginModalVisible: false,
             userInfoModalVisible: false,
+            searchHistoryVisible: false,
             closeTipsText: "",
             userInfo: computed(() => store.state.userInfo),
+            isClickOnce: false,
+            searchKeyword: "",
+            hasReturned: false,
         });
         store.dispatch("getUserInfo");
         useClickDocument(() => {
             state.themePanelVisible = false;
             state.userInfoModalVisible = false;
+            state.isClickOnce ? (state.searchHistoryVisible = false) : false;
         });
+        useClickOnce(
+            () => {
+                state.isClickOnce = true;
+            },
+            () => {
+                state.isClickOnce = false;
+            }
+        );
         const handleCloseWindow = () => {
             state.closeModalVisible = true;
             if (window.navigator.userAgent.includes("Firefox")) {
@@ -95,11 +135,26 @@ export default defineComponent({
                 toggleFullScreen();
             }
         };
+        const SearchKeywordKeyup = e => {
+            if (e.keyCode === 13) {
+                if (localStorage[searchHistoryKey]) {
+                    let searchHistory = JSON.parse(localStorage[searchHistoryKey]);
+                    searchHistory.push({ title: state.searchKeyword });
+                    localStorage[searchHistoryKey] = JSON.stringify(searchHistory);
+                }
+            }
+        };
+        const routeBack = () => {
+            state.hasReturned = true;
+            router.back();
+        };
         return {
+            SearchKeywordKeyup,
             toggleFullScreen,
             handleCloseWindow,
             clickNav,
             window,
+            routeBack,
             ...toRefs(state),
         };
     },
@@ -109,7 +164,6 @@ export default defineComponent({
 <style scoped lang="scss">
 .nav {
     height: 60px;
-    width: 100vw;
     flex-shrink: 0;
     .leftArea {
         .logo {
@@ -120,10 +174,35 @@ export default defineComponent({
             height: 45px;
             transform: scale(0.88);
         }
+        .routerBackIcon {
+            width: 25px;
+            height: 25px;
+            background-color: rgba($color: #000000, $alpha: 0.12);
+            cursor: pointer;
+        }
+        .cantBack {
+            cursor: auto;
+            background-color: rgba($color: #000000, $alpha: 0.06);
+            svg {
+                opacity: 0.3;
+            }
+        }
+        .searchBox {
+            background-color: rgba($color: #000000, $alpha: 0.04);
+            height: 32px;
+        }
+        .searchInput {
+            height: 26px;
+            outline: none !important;
+            border: none;
+            background-color: transparent;
+            &::placeholder {
+                color: rgba($color: #ffffff, $alpha: 0.35);
+            }
+        }
     }
     .rightArea {
         position: relative;
-        /* margin-right: 200px !important; */
         flex-shrink: 0;
         svg {
             opacity: 0.86;

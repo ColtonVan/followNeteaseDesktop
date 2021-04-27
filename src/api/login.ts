@@ -1,31 +1,47 @@
 import axiosInstance, { AxiosResponseProps } from "@/utils/request";
-const { request, get, post } = axiosInstance;
 export const getQrKey = () => {
-    return get("/login/qr/key", { params: { timeStamp: Date.now() } });
-}
+    return axiosInstance.get("/login/qr/key", { params: { timeStamp: Date.now() } });
+};
 export const createLoginQr = (params?: any) => {
-    return get("/login/qr/create", { params: params || {} });
-}
+    return axiosInstance.get("/login/qr/create", { params: params || {} });
+};
 export const checkQrStatus = (params?: any) => {
-    return get("/login/qr/check", { params: params || {} });
-}
+    return axiosInstance.get("/login/qr/check", { params: params || {} });
+};
 export const getAccountInfo = () => {
-    return get("/user/account", { params: { timeStamp: Date.now() } });
-}
+    return axiosInstance.get("/user/account", { params: { timeStamp: Date.now() } });
+};
 export const getUserInfo = () => {
     return getAccountInfo().then(async (res: any) => {
         if (res.code === 200) {
-            return await get("/user/account", { params: { uid: res.account.id, timeStamp: Date.now() } });
+            return await axiosInstance.get("/user/account", { params: { uid: res.account.id, timeStamp: Date.now() } });
         }
-    })
-}
+    });
+};
 export const getUserDetail = () => {
     return getAccountInfo().then(async (res: any) => {
         if (res.code === 200) {
-            return await get("/user/detail", { params: { uid: res.account.id, timeStamp: Date.now() } });
+            return await axiosInstance.get("/user/detail", { params: { uid: res.account.id, timeStamp: Date.now() } });
         }
-    })
-}
+    });
+};
+export const getLikeList = () => {
+    return getAccountInfo().then(async (res: any) => {
+        if (res.code === 200) {
+            return await axiosInstance.get("/likelist", { params: { uid: res.account.id } });
+        }
+    });
+};
 export const logout = () => {
-    return get("/logout", { params: { timeStamp: Date.now() } });
-}
+    return axiosInstance.get("/logout", { params: { timeStamp: Date.now() } });
+};
+export const dailySignin = () => {
+    return axiosInstance.get("/daily_signin", { params: { timeStamp: Date.now(), type: 1 } });
+};
+export const getUserPlayList = () => {
+    return getAccountInfo().then(async (res: any) => {
+        if (res.code === 200) {
+            return await axiosInstance.get("/user/playlist", { params: { uid: res.account.id, t: Date.now() } });
+        }
+    });
+};
