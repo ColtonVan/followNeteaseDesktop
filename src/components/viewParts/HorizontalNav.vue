@@ -41,7 +41,7 @@ export default defineComponent({
         });
         //点击导航标题
         const clickNavItem = (nav, navIndex) => {
-            state.navList = state.navList.map((item, index) => {
+            state.navList = (state.navList as any[]).map((item, index) => {
                 if (index == navIndex) {
                     return {
                         ...item,
@@ -60,7 +60,7 @@ export default defineComponent({
         };
         return {
             ...toRefs(state),
-            clickNavItem
+            clickNavItem,
         };
     },
 });
