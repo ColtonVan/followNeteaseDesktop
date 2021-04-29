@@ -17,7 +17,7 @@ const routes: Array<RouteRecordRaw> = [
                     {
                         path: "/discoverMusic/personalizedRec",
                         name: "personalizedRec",
-                        component: () => import("@/views/personalizedRec.vue"),
+                        component: () => import("@/views/views/personalizedRec.vue"),
                     },
                 ],
             },
@@ -25,6 +25,11 @@ const routes: Array<RouteRecordRaw> = [
                 path: "/dailyRec",
                 name: "dailyRec",
                 component: () => import("@/views/dailyRec.vue"),
+            },
+            {
+                path: "/videos",
+                name: "videos",
+                component: () => import("@/views/videos.vue")
             },
         ],
     },

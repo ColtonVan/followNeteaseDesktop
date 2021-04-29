@@ -167,7 +167,7 @@ export default defineComponent({
     flex-shrink: 0;
     .leftArea {
         .logo {
-            background-image: url(../assets/img/topbar.png);
+            background-image: url(../../assets/img/topbar.png);
             background-repeat: no-repeat;
             background-position: 0 -12.5px;
             width: 170px;

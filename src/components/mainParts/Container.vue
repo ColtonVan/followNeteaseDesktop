@@ -1,5 +1,5 @@
 <template>
-    <div class="flex-grow-1 routerContainer">
+    <div class="flex-shrink-0 routerContainer px-5 py-4">
         <router-view></router-view>
     </div>
 </template>
@@ -12,7 +12,9 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-.routerContainer{
+.routerContainer {
     height: calc(100vh - 75px - 60px);
+    width: calc(100vw - 200px);
+    overflow-x: hidden;
 }
 </style>

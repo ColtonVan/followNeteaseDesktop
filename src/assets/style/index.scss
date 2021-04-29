@@ -33,7 +33,7 @@ a {
     cursor: pointer;
     opacity: 0.86;
     &:hover {
-        opacity: 1!important;
+        opacity: 1 !important;
     }
 }
 .hideScrollBar {
@@ -41,16 +41,27 @@ a {
         display: none;
     }
 }
-.text-ellipsis{
+.text-ellipsis {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-.flex-center{
+.flex-center {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-shrink: 0;
+}
+.filter-invert-1 {
+    filter: invert(1);
+}
+@for $index from -10 to 10 {
+    .translate-x-#{$index * 10} {
+        transform: translateX(#{$index * 10%});
+    }
+    .translate-y-#{$index * 10} {
+        transform: translateY(#{$index * 10%});
+    }
 }
 // 鼠标样式
 @each $item in $cursors {
