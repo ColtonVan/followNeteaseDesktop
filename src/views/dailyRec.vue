@@ -186,6 +186,9 @@ export default defineComponent({
     .playAllBtn {
         background-color: $primary;
     }
+    .okBtn {
+        background-color: $primary;
+    }
 }
 .darkTheme {
     .dateText {
@@ -194,12 +197,18 @@ export default defineComponent({
     .playAllBtn {
         background-color: $dark;
     }
+    .okBtn {
+        background-color: $dark;
+    }
 }
 .freeTheme {
     .dateText {
         color: $free;
     }
     .playAllBtn {
+        background-color: $free;
+    }
+    .okBtn {
         background-color: $free;
     }
 }
@@ -272,20 +281,5 @@ export default defineComponent({
 }
 .cancelBtn {
     background-color: #fff !important;
-}
-.primaryTheme {
-    .okBtn {
-        background-color: $primary;
-    }
-}
-.darkTheme {
-    .okBtn {
-        background-color: $dark;
-    }
-}
-.freeTheme {
-    .okBtn {
-        background-color: $free;
-    }
 }
 </style>

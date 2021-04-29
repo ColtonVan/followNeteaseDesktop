@@ -1,5 +1,5 @@
 <template>
-    <div v-if="visible" class="videoGroupPanel position-absolute start-0 shadow rounded-7 p-4 hideScrollBar">
+    <div v-if="visible" class="videoGroupPanel position-absolute start-0 shadow rounded-7 p-4 hideScrollBar bg-white">
         <div class="d-flex justify-content-start pb-3 mb-3 border-bottom">
             <div
                 :class="{ selected: item.active }"
@@ -106,7 +106,7 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .videoGroupPanel {
-    top: 36px;
+    top: 42px;
     z-index: 9;
     width: 660px;
     height: 500px;

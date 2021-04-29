@@ -29,7 +29,12 @@ const routes: Array<RouteRecordRaw> = [
             {
                 path: "/videos",
                 name: "videos",
-                component: () => import("@/views/videos.vue")
+                component: () => import("@/views/videos.vue"),
+            },
+            {
+                path: "createdMusicList",
+                name: "createdMusicList",
+                component: () => import("@/views/createdMusicList.vue"),
             },
         ],
     },

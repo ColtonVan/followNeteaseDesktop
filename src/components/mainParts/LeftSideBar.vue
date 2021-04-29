@@ -50,7 +50,7 @@
                 "
             >
                 <LikedIcon class="me-2" width="15px" height="15px" />
-                <span>{{ menu.title }}</span>
+                <span>我喜欢的音乐</span>
                 <div
                     class="heartBeat rounded-pill py-1 px-3 border ms-2 d-flex align-items-center"
                     @mouseover="canMyLikeHover = false"
@@ -77,7 +77,7 @@
                     clickMenuItem(menu);
                 "
             >
-                <LikedIcon class="me-2" width="15px" height="15px" />
+                <MusicListIcon class="me-2" width="20" height="20" />
                 <span class="text-ellipsis">{{ menu.name }}</span>
             </div>
         </div>
@@ -85,7 +85,7 @@
 
     <CommonModal title="新建歌单" v-model:visible="addListModalVisible">
         <template #default>
-            <input class="listNameInput py-2 px-3 rounded mb-2" v-model="addMusicListObj.name" type="text" placeholder="请输入新歌单标题" />
+            <input @keyup.enter="keyupNmaeInput" class="listNameInput py-2 px-3 rounded mb-2" v-model="addMusicListObj.name" type="text" placeholder="请输入新歌单标题" />
             <label for="isPrivate" class="d-flex align-items-center fs-5">
                 <input class="me-2" type="checkbox" v-model="addMusicListObj.isPrivate" name="isPrivate" id="isPrivate" />
                 设置为隐私歌单
@@ -136,10 +136,11 @@ export default defineComponent({
                 title: "私人FM",
                 key: "srfm",
             },
-            {
-                title: "我喜欢的音乐",
-                key: "wxhdyy",
-            },
+            // {
+            //     title: "我喜欢的音乐",
+            //     key: "wxhdyy",
+            //     id: 0,
+            // },
         ];
         const state = reactive({
             collapsed: false,
@@ -162,6 +163,9 @@ export default defineComponent({
             }
         );
         const clickMenuItem = menuItem => {
+            if (menuItem.id !== undefined) {
+                return router.push({ path: "/createdMusicList", query: { id: menuItem.id } });
+            }
             if (menuItem.path) {
                 router.push(menuItem.path);
             }
@@ -172,8 +176,11 @@ export default defineComponent({
             if (isPrivate) params.privacy = 10;
             createPlayListApi(params).then((res: AxiosResponseProps) => {
                 if (res.code === 200) {
-                    state.addListModalVisible = false;
-                    state.commonModalRef.success("创建歌单成功");
+                    store.dispatch("getCreatedMusicList").then(() => {
+                        state.addListModalVisible = false;
+                        state.commonModalRef.success("创建歌单成功");
+                        state.addMusicListObj.name = "";
+                    });
                 }
             });
         };
@@ -181,8 +188,12 @@ export default defineComponent({
             store.dispatch("getCreatedMusicList");
         };
         getCreatedMusicList();
+        const keyupNmaeInput = e => {
+            createList();
+        };
         return {
             ...toRefs(state),
+            keyupNmaeInput,
             clickMenuItem,
             createList,
             window,

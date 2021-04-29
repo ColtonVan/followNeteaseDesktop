@@ -16,12 +16,11 @@
                 }}</span>
             </div>
         </div>
-
-        <div class="flex-grow-1 overflow-scroll hideScrollBar">
-            <div class="container">
-                <div class="row d-flex flex-column align-items-center">
-                    <div class="col-xxl-10 containerCol">
-                        <VideoList v-model:id="groupId" />
+        <div class="flex-grow-1">
+            <div class="container h-100">
+                <div class="h-100 row d-flex flex-column align-items-center">
+                    <div class="h-100 col-xxl-10 containerCol">
+                        <VideoList style="height: calc(100vh - 75px - 60px - 38px - 40px - 3.3rem);" class="pt-5" v-model:id="groupId" />
                     </div>
                 </div>
             </div>

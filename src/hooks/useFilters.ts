@@ -22,3 +22,10 @@ export const musicQuality = (level: string) => {
     }
     return "标注";
 };
+export const YYYYMMDD = () => {
+    let currentDate = new Date();
+    let YYYY = currentDate.getFullYear();
+    let MM = String(currentDate.getMonth() + 1).padStart(2, "0");
+    let DD = String(currentDate.getDate()).padStart(2, "0");
+    return `${YYYY}-${MM}-${DD}`;
+};

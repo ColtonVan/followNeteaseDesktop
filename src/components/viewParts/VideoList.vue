@@ -1,27 +1,30 @@
 <template>
-    <div class="videoList w-100 d-flex flex-wrap justify-content-between">
+    <div v-loadMore="scrollList" class="videoList hideScrollBar overflow-scroll w-100 d-flex flex-wrap justify-content-between align-items-start">
+        <LoadingComponent v-if="isLoading && !groupList.length" />
         <div
             @mouseenter="item.showPre = true"
             @mouseleave="item.showPre = false"
-            class="videoItem overflow-hidden rounded-5 mb-4 position-relative cursor-pointer"
+            class="videoItem overflow-hidden rounded-8 mb-4 position-relative cursor-pointer"
             v-for="(item, index) in groupList"
             :key="index"
         >
-            <img v-if="item.showPre && item.data.previewUrl" class="position-absolute top-0 start-0" :src="item.data.previewUrl" alt="" />
-            <img
-                v-show="!(item.showPre && item.data.previewUrl)"
-                class="position-absolute top-0 start-0"
-                :src="item.data.coverUrl"
-                alt=""
-            />
+            <img class="position-absolute top-0 start-0" :src="item.data.coverUrl" alt="" />
+            <img v-show="!item.showPre" class="position-absolute top-0 start-0" :src="item.data.coverUrl" alt="" />
+            <img v-if="item.showPre" class="position-absolute top-0 start-0" :src="item.data.previewUrl || item.data.coverUrl" alt="" />
+            <div class="playCountLine position-absolute d-flex align-items-center">
+                <HollowPlayIcon width="12" height="12" />
+                <span class="text-white ms-1">{{ playCount(item.data.playCount) }}</span>
+            </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs } from "vue";
-import { getGroupVideoApi, getAllGroupVideoApi } from "@/api/video";
-import { AxiosResponseProps } from "@/utils/request";
+import { computed, defineComponent, reactive, toRefs, watch } from "vue";
+import { getGroupVideoApi, getRecommendVideoApi } from "@/api/video";
+import { playCount } from "@/hooks/useFilters";
+let getGroupVideo = null;
+let nextPage = null;
 export default defineComponent({
     props: {
         id: {
@@ -29,30 +32,73 @@ export default defineComponent({
             default: 0,
         },
     },
-    setup(props, { emit }) {
+    directives: {
+        loadMore: {
+            mounted(el, binding, vnode, prevVNode) {
+                el.addEventListener("scroll", e => {
+                    let { clientHeight, scrollTop, scrollHeight } = e.target;
+                    console.log({ clientHeight, scrollTop, scrollHeight });
+                    if (clientHeight + scrollTop >= scrollHeight) {
+                        nextPage();
+                        getGroupVideo();
+                    }
+                });
+            },
+        },
+    },
+    setup(props, context) {
         const state = reactive({
             groupId: computed({
                 get: () => props.id,
-                set: newV => emit("update:id", newV),
+                set: newV => context.emit("update:id", newV),
             }),
             groupList: [],
+            page: 1,
+            isLoading: false,
+            hasMore: true,
         });
-        const getGroupVideo = () => {
-            let apiFun = getGroupVideoApi;
-            let parmas: any = { id: state.groupId };
-            if (state.groupId === 0) {
-                apiFun = getAllGroupVideoApi;
-                parmas = {};
+        watch(
+            () => props.id,
+            newV => {
+                state.page = 1;
+                state.groupList = [];
+                getGroupVideo();
             }
-            apiFun(parmas).then((res: any) => {
-                if (res.code === 200) {
-                    state.groupList = res.datas;
-                }
-            });
+        );
+        getGroupVideo = () => {
+            state.isLoading = true;
+            let apiFun = getGroupVideoApi;
+            let params: any = { offset: (state.page - 1) * 8 };
+            if (state.groupId === 0) {
+                apiFun = getRecommendVideoApi;
+                params = { ...params };
+            } else {
+                params = { ...params, id: state.groupId };
+            }
+            apiFun(params)
+                .then((res: any) => {
+                    state.isLoading = false;
+                    if (res.code === 200) {
+                        state.groupList = state.groupList.concat(res.datas);
+                        if (state.groupList.length < 24 && res.datas.length) {
+                            nextPage();
+                            getGroupVideo();
+                        }
+                    }
+                })
+                .catch(err => {
+                    state.isLoading = true;
+                });
         };
         getGroupVideo();
+        nextPage = () => {
+            state.page++;
+        };
+        const scrollList = () => {};
         return {
             ...toRefs(state),
+            scrollList,
+            playCount
         };
     },
 });
@@ -61,21 +107,31 @@ export default defineComponent({
 <style scoped lang="scss">
 .videoList {
     .videoItem {
-        padding-left: 22%;
-        padding-top: 12%;
+        padding-left: 23%;
+        padding-top: 13%;
         width: 0;
         height: 0;
         > img {
             width: 100%;
             height: 100%;
+            object-fit: contain;
+        }
+        > img:nth-child(1) {
+            object-fit: cover;
         }
         > img:nth-child(2) {
             // display: none;
+            // visibility: hidden;
         }
         &:hover {
             > img:nth-child(2) {
                 // display: inline-block;
+                // visibility: visible;
             }
+        }
+        .playCountLine {
+            top: 3px;
+            right: 8px;
         }
     }
 }

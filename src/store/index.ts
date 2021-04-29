@@ -65,8 +65,8 @@ const store = createStore({
                 }
             });
         },
-        getCreatedMusicList({ commit }, params) {
-            getUserPlayList().then((res: any) => {
+        async getCreatedMusicList({ commit }, params) {
+            return await getUserPlayList().then((res: any) => {
                 if (res.code === 200) {
                     commit("changeCreatedMusicList", res.playlist);
                 }
