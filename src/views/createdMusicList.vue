@@ -25,11 +25,12 @@
         </div>
     </div>
     <HorizontalNav v-model:navs="navs" class="pb-2" />
-    <MusicList :columns="columns" :dataSource="playListDetail.tracks" />
+    <MusicList v-if="navs.find(item => item.active).key === 0" :columns="columns" :dataSource="playListDetail.tracks" />
+    
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, watch, watchEffect } from "vue";
+import { computed, defineComponent, reactive, toRefs, watch, watchEffect } from "vue";
 import { getPlayListDetailApi } from "@/api/playList";
 import { AxiosResponseProps } from "@/utils/request";
 import { useRoute } from "vue-router";
@@ -65,17 +66,20 @@ export default defineComponent({
                     },
                 },
             ],
-            playListDetail: [],
+            playListDetail: {},
             navs: [
                 {
                     title: "歌曲列表",
                     active: true,
+                    key: 0,
                 },
                 {
-                    title: "评论",
+                    title: computed(() => `评论(${state.playListDetail.commentCount})`),
+                    key: 1,
                 },
                 {
                     title: "收藏者",
+                    key: 2,
                 },
             ],
         });

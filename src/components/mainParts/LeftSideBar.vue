@@ -1,5 +1,5 @@
 <template>
-    <div class="leftSideBar border-end ps-3 pe-1 pt-2 fs-5 flex-shrink-0">
+    <div class="leftSideBar hideScrollBar border-end ps-3 pe-1 pt-2 fs-5 flex-shrink-0">
         <div
             class="mt-1 p-2 cursor-pointer rounded hover-menuItem"
             :class="{ visitedMenu: menu.active, 'fw-bold': menu.active }"
@@ -20,19 +20,19 @@
         </div>
 
         <div
-            @click="collapsed = !collapsed"
+            @click="createdCollapsed = !createdCollapsed"
             class="hover-arrow cursor-pointer text-black-50 fs-6 ps-2 py-3 d-flex align-items-center justify-content-between"
         >
-            <div :title="collapsed ? '展开' : '收起'">
+            <div :title="createdCollapsed ? '展开' : '收起'">
                 <span class="me-2">创建的歌单</span>
-                <DownArrowIcon :class="{ collapsed }" class="downArrow" color="rgba(0, 0, 0, 0.5)" width="10px" height="10px" />
+                <DownArrowIcon :class="{ createdCollapsed }" class="downArrow" color="rgba(0, 0, 0, 0.5)" width="10px" height="10px" />
             </div>
             <div title="新建歌单">
                 <PlusIcon @click.stop="addListModalVisible = true" width="15" height="15" class="plusIcon me-5" />
             </div>
         </div>
 
-        <div v-if="!collapsed">
+        <div v-if="!createdCollapsed">
             <div
                 class="mt-1 p-2 cursor-pointer rounded likedMusic d-flex align-items-center"
                 v-for="menu in menuList.slice(5, 6)"
@@ -62,7 +62,46 @@
 
             <div
                 class="mt-1 p-2 cursor-pointer rounded likedMusic d-flex align-items-center"
-                v-for="menu in menuList.slice(6)"
+                v-for="menu in menuList.filter(item => item.type === 'created')"
+                :key="menu.key"
+                :class="{ visitedMenu: menu.active, 'hover-menuItem': canMyLikeHover }"
+                :title="menu.name"
+                @click="
+                    menuList = menuList.map((item, index) => {
+                        if (menu.key === item.key) {
+                            return { ...item, active: true };
+                        } else {
+                            return { ...item, active: false };
+                        }
+                    });
+                    clickMenuItem(menu);
+                "
+            >
+                <MusicListIcon class="me-2" width="20" height="20" />
+                <span class="text-ellipsis">{{ menu.name }}</span>
+            </div>
+        </div>
+
+        <div
+            @click="collectedCollapsed = !collectedCollapsed"
+            class="hover-arrow cursor-pointer text-black-50 fs-6 ps-2 py-3 d-flex align-items-center justify-content-between"
+        >
+            <div :title="collectedCollapsed ? '展开' : '收起'">
+                <span class="me-2">收藏的歌单</span>
+                <DownArrowIcon
+                    :class="{ createdCollapsed: collectedCollapsed }"
+                    class="downArrow"
+                    color="rgba(0, 0, 0, 0.5)"
+                    width="10px"
+                    height="10px"
+                />
+            </div>
+        </div>
+
+        <div v-if="!collectedCollapsed">
+            <div
+                class="mt-1 p-2 cursor-pointer rounded likedMusic d-flex align-items-center"
+                v-for="menu in menuList.filter(item => item.type === 'collected')"
                 :key="menu.key"
                 :class="{ visitedMenu: menu.active, 'hover-menuItem': canMyLikeHover }"
                 :title="menu.name"
@@ -85,7 +124,13 @@
 
     <CommonModal title="新建歌单" v-model:visible="addListModalVisible">
         <template #default>
-            <input @keyup.enter="keyupNmaeInput" class="listNameInput py-2 px-3 rounded mb-2" v-model="addMusicListObj.name" type="text" placeholder="请输入新歌单标题" />
+            <input
+                @keyup.enter="keyupNmaeInput"
+                class="listNameInput py-2 px-3 rounded mb-2"
+                v-model="addMusicListObj.name"
+                type="text"
+                placeholder="请输入新歌单标题"
+            />
             <label for="isPrivate" class="d-flex align-items-center fs-5">
                 <input class="me-2" type="checkbox" v-model="addMusicListObj.isPrivate" name="isPrivate" id="isPrivate" />
                 设置为隐私歌单
@@ -143,7 +188,8 @@ export default defineComponent({
             // },
         ];
         const state = reactive({
-            collapsed: false,
+            createdCollapsed: false,
+            collectedCollapsed: false,
             canMyLikeHover: true,
             addListModalVisible: false,
             addMusicListObj: {
@@ -152,13 +198,18 @@ export default defineComponent({
             },
             commonModalRef: ref(null),
             createdMusicList: computed(() => store.state.createdMusicList.filter(item => item.creator.userId === userId.value)),
+            collectedMusicList: computed(() => store.state.createdMusicList.filter(item => item.creator.userId !== userId.value)),
             menuList: [...initMenuList],
         });
         watch(
             () => state.createdMusicList,
             newV => {
                 if (newV && newV.length) {
-                    state.menuList = [...initMenuList, ...newV.map(item => ({ ...item, key: item.id }))];
+                    state.menuList = [
+                        ...initMenuList,
+                        ...newV.map(item => ({ ...item, key: item.id, type: "created" })),
+                        ...state.collectedMusicList.map(item => ({ ...item, key: item.id, type: "collected" })),
+                    ];
                 }
             }
         );
@@ -206,6 +257,7 @@ export default defineComponent({
 .leftSideBar {
     width: 200px;
     height: calc(100vh - 75px - 60px);
+    overflow-y: scroll;
     .hover-menuItem {
         &:hover {
             background-color: #f3f3f3;
@@ -223,7 +275,7 @@ export default defineComponent({
                 opacity: 1;
             }
         }
-        .collapsed {
+        .createdCollapsed {
             transform: translateY(-15%) rotate(-90deg) !important;
         }
         .downArrow {
