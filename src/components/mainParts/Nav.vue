@@ -221,10 +221,10 @@ export default defineComponent({
     font-size: 14px;
     line-height: 2;
     @extend .canSelect;
-    ::v-deep > div:first-child {
+    :deep > div:first-child {
         font-weight: bold;
     }
-    ::v-deep > ul {
+    :deep > ul {
         text-align: left;
     }
 }

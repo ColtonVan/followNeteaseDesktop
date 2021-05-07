@@ -3,7 +3,9 @@
         <div class="m-5 d-flex">
             <div class="position-relative calendarBox">
                 <CalendarIcon width="90" height="90" :color="calendarColor" />
-                <div class="dateText fw-bold position-absolute start-50 fs-1 translate-middle">{{ new window.Date().getDate() }}</div>
+                <div class="dateText fw-bold position-absolute start-50 fs-1 translate-middle">
+                    {{ new window.Date().getDate() }}
+                </div>
             </div>
             <div class="ms-5 d-flex flex-column justify-content-center">
                 <div class="fs-1">每日歌曲推荐</div>
@@ -22,50 +24,43 @@
                     <PlusIcon width="20" height="20" />
                 </div>
             </div>
-            <div @click="colVisible = true" class="collectList ms-3 rounded-pill px-5 border d-flex align-items-center cursor-pointer hover-btn">
+            <div
+                @click="colVisible = true"
+                class="collectList ms-3 rounded-pill px-5 border d-flex align-items-center cursor-pointer hover-btn"
+            >
                 <CollectList width="20" height="20" />
                 <span class="ms-2">收藏全部</span>
             </div>
         </div>
         <div class="border-top mb-5">
-            <div class="row songRow headRow w-100">
-                <div class="col-6 p-3 text-black-50 fs-5 songCol">音乐标题</div>
-                <div class="col p-3 text-black-50 fs-5 songCol">歌手</div>
-                <div class="col p-3 text-black-50 fs-5 songCol">专辑</div>
-                <div class="col p-3 text-black-50 fs-5 songCol">时长</div>
-            </div>
-            <div class="row ps-5 songRow w-100" v-for="(dailySong, dailySongIndex) in dailySongs" :key="dailySongIndex">
-                <div class="col-6 p-3 songCol">
-                    <span class="text-black-50 me-4">{{ String(dailySongIndex + 1).padStart(2, "0") }}</span>
-                    <HaveLikedIcon
-                        @click="collectMusic(dailySong, false)"
-                        v-if="likeList.includes(dailySong.id)"
-                        width="14"
-                        height="14"
-                        class="hover-likedIcon"
-                    />
-                    <LikedIcon @click="collectMusic(dailySong, true)" v-else width="14" height="14" class="hover-icon" />
-                    <DownloadMusicIcon @click="tryDownloadMusic(dailySong)" width="14" height="14" class="hover-icon ms-4" />
-                    <span class="ms-4">{{ dailySong.name }}</span>
-                </div>
-                <div class="col-2 p-3 songCol">{{ dailySong.ar.map(item => item.name).join("、") }}</div>
-                <div class="col-2 p-3 songCol">{{ dailySong.al.name }}</div>
-                <div class="col-2 p-3 songCol">{{ playTime(dailySong.dt) }}</div>
-            </div>
+            <MusicList :columns="columns" :dataSource="dailySongs" />
         </div>
     </div>
     <CommonModal v-model:visible="downloadModalVisible">
         <template #default>
             <div class="d-flex justify-content-center">
-                <div v-for="(item, index) in songsUrlObjArr" :key="index" class="d-flex align-items-center cursor-pointer">
-                    <input type="radio" :name="item.level" :id="item.level" v-model="item.checked" :checked="item.checked" />
+                <div
+                    v-for="(item, index) in songsUrlObjArr"
+                    :key="index"
+                    class="d-flex align-items-center cursor-pointer"
+                >
+                    <input
+                        type="radio"
+                        :name="item.level"
+                        :id="item.level"
+                        v-model="item.checked"
+                        :checked="item.checked"
+                    />
                     <label class="ms-3" :for="item.level">{{ musicQuality(item.level) }}</label>
                 </div>
             </div>
         </template>
         <template #buttons>
             <div class="d-flex justify-content-center">
-                <div @click="confirmDownload" class="okBtn cursor-pointer d-flex justify-content-center align-items-center">
+                <div
+                    @click="confirmDownload"
+                    class="okBtn cursor-pointer d-flex justify-content-center align-items-center"
+                >
                     确定
                 </div>
                 <div
@@ -101,6 +96,33 @@ export default defineComponent({
             likeList: [],
             commonToast: ref(null),
             colVisible: false,
+            columns: [
+                {
+                    title: "音乐标题",
+                    dataIndex: "name",
+                },
+                {
+                    title: "歌手",
+                    dataIndex: "ar",
+                    render: text => {
+                        return text.map(item => item.name).join("、");
+                    },
+                },
+                {
+                    title: "专辑",
+                    dataIndex: "al",
+                    render: text => {
+                        return text.name;
+                    },
+                },
+                {
+                    title: "时长",
+                    dataIndex: "dt",
+                    render: text => {
+                        return playTime(text);
+                    },
+                },
+            ]
         });
         watch(
             () => state.songsUrlObjArr,
@@ -131,7 +153,11 @@ export default defineComponent({
         };
         getLikeList();
         const calendarColor = computed(() =>
-            store.getters.getTheme === "primaryTheme" ? "#ec4141" : store.getters.getTheme === "darkTheme" ? "#212529" : "#50c475"
+            store.getters.getTheme === "primaryTheme"
+                ? "#ec4141"
+                : store.getters.getTheme === "darkTheme"
+                ? "#212529"
+                : "#50c475"
         );
         const tryDownloadMusic = item => {
             state.currentMusicObj = item;
@@ -156,11 +182,13 @@ export default defineComponent({
         const collectMusic = (item, like) => {
             likeMusic({ id: item.id, like }).then((res: any) => {
                 if (res.code === 200) {
-                    Promise.all([getRec(), getLikeList()]).then(([res1, res2]: [AxiosResponseProps, AxiosResponseProps]) => {
-                        if (res1.code === 200 && res2.code === 200) {
-                            state.commonToast.success(like ? "已添加到我喜欢的音乐" : "取消喜欢成功");
+                    Promise.all([getRec(), getLikeList()]).then(
+                        ([res1, res2]: [AxiosResponseProps, AxiosResponseProps]) => {
+                            if (res1.code === 200 && res2.code === 200) {
+                                state.commonToast.success(like ? "已添加到我喜欢的音乐" : "取消喜欢成功");
+                            }
                         }
-                    });
+                    );
                 }
             });
         };
@@ -238,36 +266,6 @@ export default defineComponent({
     }
     .collectList {
         height: 36px;
-    }
-    .headRow {
-        .songCol {
-            text-align: center;
-        }
-    }
-    .songRow {
-        .songCol {
-            box-sizing: border-box;
-            @extend .text-ellipsis;
-            .hover-icon {
-                @extend .cursor-pointer;
-                opacity: 0.5;
-                &:hover {
-                    opacity: 1;
-                }
-            }
-        }
-        &:hover {
-            background-color: rgb(235, 235, 235) !important;
-        }
-    }
-    .songRow:nth-child(odd) {
-        background-color: #f1f1f1;
-    }
-    .songRow:nth-child(even) {
-        background-color: #fff;
-    }
-    .songRow:nth-child(1) {
-        background-color: #fff;
     }
 }
 .okBtn {

@@ -15,6 +15,7 @@ export const useClickDom = (domId: string, callback: () => void) => {
         document.getElementById(domId).removeEventListener("click", callback);
     });
 };
+//单击、长按
 export const useClickOnce = (ClickOnceCallBack: () => void, noClickOnceCallBack?: () => void) => {
     let preDate = 0;
     const handleMousedown = () => {
@@ -23,7 +24,7 @@ export const useClickOnce = (ClickOnceCallBack: () => void, noClickOnceCallBack?
     const handleMouseup = () => {
         if (Date.now() - preDate < 400) {
             ClickOnceCallBack();
-        }else{
+        } else {
             noClickOnceCallBack();
         }
     };
@@ -32,3 +33,15 @@ export const useClickOnce = (ClickOnceCallBack: () => void, noClickOnceCallBack?
         document.addEventListener("mouseup", handleMouseup);
     });
 };
+//双击
+export const useDoubleClick = () => {
+    let clickArr = [];
+    return (doubleClickCallBack: () => void) => {
+        let nowDate = Date.now();
+        if (clickArr.length && nowDate - clickArr[clickArr.length - 1] < 400) {
+            doubleClickCallBack();
+            return clickArr = [];
+        }
+        clickArr.push(nowDate);
+    }
+}

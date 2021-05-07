@@ -28,7 +28,7 @@ export const getUserDetail = () => {
 export const getLikeList = () => {
     return getAccountInfo().then(async (res: any) => {
         if (res.code === 200) {
-            return await axiosInstance.get("/likelist", { params: { uid: res.account.id } });
+            return await axiosInstance.get("/likelist", { params: { uid: res.account.id, t: Date.now() } });
         }
     });
 };

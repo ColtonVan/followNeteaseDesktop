@@ -22,7 +22,7 @@ export const getSongUrl = (id: number | string | number[] | string[] = "") => {
     return get("/song/url", { params: { id } });
 };
 export const likeMusic = (params: { id: number | string; like?: boolean }) => {
-    return get("/like", { params: params || {} });
+    return get("/like", { params: { ...params, t: Date.now() } });
 };
 export const createPlayListApi = (params: { name: string; privacy?: string | number; type?: string }) => {
     return get("/playlist/create", { params: { ...params, t: Date.now() } });

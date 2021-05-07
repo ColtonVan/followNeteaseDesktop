@@ -1,7 +1,9 @@
 <template>
     <div class="mb-5">
         <div class="row songRow headRow w-100">
-            <div v-for="(item, index) in columns" :key="index" class="col-3 p-3 text-black-50 fs-5 songCol">{{ item.title }}</div>
+            <div v-for="(item, index) in columns" :key="index" class="col-3 p-3 text-black-50 fs-5 songCol">
+                {{ item.title }}
+            </div>
         </div>
         <div v-if="!dataSource.length" class="w-100 fs-5 text-muted flex-center py-5 border-bottom">
             <div>暂无数据，快去收藏音乐吧~</div>
@@ -10,13 +12,12 @@
             <div
                 v-for="(column, columnIndex) in columns"
                 :key="columnIndex"
+                @click="clickMusicItem(data)"
                 class="col-3 p-3 songCol"
                 :class="`col-${column.span !== undefined ? column.span : 3}`"
             >
                 <span v-if="column.render">{{ column.render(data[column.dataIndex], data) }}</span>
                 <span v-else>{{ data[column.dataIndex] }}</span>
-                <!-- <pre>{{data}}</pre>
-                <pre>{{column.dataIndex}}</pre> -->
             </div>
         </div>
     </div>
@@ -24,10 +25,14 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { getSongUrlApi } from "@/api/song";
+import { useStore } from "vuex";
 export default defineComponent({
     props: {
         columns: {
-            type: Array as PropType<{ title: string; dataIndex?: string; span?: number; render?: (text: any, recF: any) => any }[]>,
+            type: Array as PropType<
+                { title: string; dataIndex?: string; span?: number; render?: (text: any, recF: any) => any }[]
+            >,
             default: [],
         },
         dataSource: {
@@ -36,7 +41,24 @@ export default defineComponent({
         },
     },
     setup() {
-        
+        const store = useStore();
+        let clickedColumns = [];
+        const clickMusicItem = column => {
+            if (
+                clickedColumns.length &&
+                Date.now() - clickedColumns[clickedColumns.length - 1].clickTime < 400 &&
+                column.id === clickedColumns[clickedColumns.length - 1].id
+            ) {
+                store.commit("changeCurrentMusicDetail",column);
+                store.dispatch("getCurrentMusicUrlInfo", { id: column.id });
+                return (clickedColumns = []);
+            }
+            column.clickTime = Date.now();
+            clickedColumns.push(column);
+        };
+        return {
+            clickMusicItem,
+        };
     },
 });
 </script>

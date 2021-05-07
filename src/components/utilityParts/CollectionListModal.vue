@@ -1,12 +1,22 @@
 <template>
-    <div v-if="modalVisible" ref="collectionListModalRef" class="collectionListModal position-absolute translate-middle bg-white shadow rounded">
-        <div ref="dragDomRef" class="title cursor-move w-100 d-flex justify-content-center align-items-center fs-5 fw-bold">
+    <div
+        v-if="modalVisible"
+        ref="collectionListModalRef"
+        class="collectionListModal position-absolute translate-middle bg-white shadow rounded"
+    >
+        <div
+            ref="dragDomRef"
+            class="title cursor-move w-100 d-flex justify-content-center align-items-center fs-5 fw-bold"
+        >
             <CloseIcon @click="modalVisible = false" class="cursor-pointer" width="18" height="18" />
             <div>收藏到歌单</div>
         </div>
         <div class="createdList overflow-scroll hideScrollBar">
             <div @click="createListAndAdd" class="px-3 py-2 d-flex align-items-center cursor-pointer createdItem">
-                <div class="createNewItemImg rounded me-3 d-flex justify-content-center align-items-center" style="height:56px;width:56px;">
+                <div
+                    class="createNewItemImg rounded me-3 d-flex justify-content-center align-items-center"
+                    style="height:56px;width:56px;"
+                >
                     <PlusIcon color="#ec4141" width="34" height="34" />
                 </div>
                 <div>
@@ -85,8 +95,10 @@ export default defineComponent({
             addDelMusicFromListApi({ pid: item.id, tracks: String(props.tracks) }).then((res1: AxiosResponseProps) => {
                 if (res1.status === 200 || res1.code === 200) {
                     getUserPlayList().then(() => {
-                        state.toastRef.success("已收藏歌单");
-                        emit("update:visible", false);
+                        store.dispatch("getCreatedMusicList").then(() => {
+                            state.toastRef.success("已收藏歌单");
+                            emit("update:visible", false);
+                        });
                     });
                 }
             });
@@ -95,9 +107,10 @@ export default defineComponent({
             let nowDate = new Date();
             try {
                 createPlayListApi({
-                    name: `每日歌曲推荐(${nowDate.getFullYear()}.${String(nowDate.getMonth() + 1).padStart(2, "0")}.${String(
-                        nowDate.getDate()
-                    ).padStart(2, "0")})`,
+                    name: `每日歌曲推荐(${nowDate.getFullYear()}.${String(nowDate.getMonth() + 1).padStart(
+                        2,
+                        "0"
+                    )}.${String(nowDate.getDate()).padStart(2, "0")})`,
                 }).then((res: any) => {
                     if (res.code === 200) {
                         addToList(res.id);

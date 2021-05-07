@@ -115,18 +115,17 @@ export default defineComponent({
                 });
             });
         };
+        getBanners_com();
         //开始轮播
         let swiperTimer = null;
         const startSwiper = () => {
-            getBanners_com().then(() => {
-                swiperTimer = setInterval(() => {
-                    if (state.currentActiveIndex < state.banners.length - 1) {
-                        state.currentActiveIndex++;
-                    } else {
-                        state.currentActiveIndex = 0;
-                    }
-                }, 5000);
-            });
+            swiperTimer = setInterval(() => {
+                if (state.currentActiveIndex < state.banners.length - 1) {
+                    state.currentActiveIndex++;
+                } else {
+                    state.currentActiveIndex = 0;
+                }
+            }, 5000);
         };
         startSwiper();
         const getPersonalized = () => {
@@ -153,9 +152,11 @@ export default defineComponent({
         });
         const changeBanner = tag => {
             if (tag === "pre") {
-                state.currentActiveIndex = state.currentActiveIndex === 0 ? state.banners.length - 1 : state.currentActiveIndex - 1;
+                state.currentActiveIndex =
+                    state.currentActiveIndex === 0 ? state.banners.length - 1 : state.currentActiveIndex - 1;
             } else if (tag === "next") {
-                state.currentActiveIndex = state.currentActiveIndex === state.banners.length - 1 ? 0 : state.currentActiveIndex + 1;
+                state.currentActiveIndex =
+                    state.currentActiveIndex === state.banners.length - 1 ? 0 : state.currentActiveIndex + 1;
             }
         };
         const stopSwiper = () => {
@@ -260,7 +261,7 @@ export default defineComponent({
             background-color: #ccc;
             background-size: cover;
             background-repeat: no-repeat;
-            *{
+            * {
                 z-index: 3;
             }
             .playCountLine {
