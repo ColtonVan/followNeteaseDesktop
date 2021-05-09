@@ -14,7 +14,9 @@ const store = createStore({
         routeFromList: [],
         currentMusicDetail: {},
         currentMusicUrlInfo: [],
-        isMusicPlaying: false
+        currentPlayList: [],
+        isMusicPlaying: false,
+        showPlayList: false
     },
     getters: {
         getTheme(state) {
@@ -64,6 +66,13 @@ const store = createStore({
         },
         changeIsMusicPlaying(state, val) {
             state.isMusicPlaying = val;
+        },
+        changeShowPlayList(state, val) {
+            state.showPlayList = val;
+        },
+        changeCurrentPlayList(state, val) {
+            localStorage["currentPlayList"] = JSON.stringify(val);
+            state.currentPlayList = val;
         }
     },
     actions: {
@@ -123,4 +132,9 @@ if (localCurrentMusicUrlInfo) {
 let localCurrentMusicDetail = localStorage["currentMusicDetail"];
 if (localCurrentMusicDetail) {
     store.commit("changeCurrentMusicDetail", JSON.parse(localCurrentMusicDetail));
+}
+//播放列表持久化-读取
+let localCurrentPlayList = localStorage["currentPlayList"];
+if (localCurrentPlayList) {
+    store.commit("changeCurrentPlayList", JSON.parse(localCurrentPlayList));
 }

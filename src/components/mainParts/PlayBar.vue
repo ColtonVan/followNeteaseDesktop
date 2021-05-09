@@ -66,7 +66,7 @@
                         volumeProgress = 0;
                         musicMuted = true;
                     "
-                    class="cursor-pointer"
+                    class="cursor-pointer hover-opacity"
                     width="28"
                     height="28"
                 />
@@ -77,7 +77,12 @@
                 width="60px"
                 :title="`${volumeProgress.toFixed()}%`"
             />
-            <PlayListIcon class="ms-4 cursor-pointer opacity-75" width="22" height="22" />
+            <PlayListIcon
+                @click.stop="$store.commit('changeShowPlayList', !$store.state.showPlayList)"
+                class="ms-4 cursor-pointer opacity-75 hover-opacity"
+                width="22"
+                height="22"
+            />
         </div>
     </div>
     <CommonToast ref="toastRef" />
@@ -118,9 +123,6 @@ export default defineComponent({
         const playMusic = () => {
             nextTick(() => {
                 setTimeout(() => {
-                    state.musicTimeLength = state.audioTag.duration * 1000;
-                    state.audioTag.play();
-                    store.commit("changeIsMusicPlaying", true);
                     state.audioTag.addEventListener("timeupdate", event => {
                         state.musicCurrentTime = event.target.currentTime * 1000;
                         state.mtProgress = (100 * event.target.currentTime) / event.target.duration;
@@ -128,6 +130,8 @@ export default defineComponent({
                     state.audioTag.onerror = err => {
                         state.toastRef.warn("播放失败，请稍后重试");
                     };
+                    state.audioTag.play();
+                    store.commit("changeIsMusicPlaying", true);
                 }, 140);
             });
         };
@@ -152,6 +156,12 @@ export default defineComponent({
                 }
             }
         );
+        onMounted(() => {
+            //在第一帧数据加载完成后触发
+            state.audioTag.onloadeddata = () => {
+                state.musicTimeLength = state.audioTag.duration * 1000;
+            };
+        });
         return {
             ...toRefs(state),
             playTime,

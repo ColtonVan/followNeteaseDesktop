@@ -40,7 +40,7 @@ export default defineComponent({
             default: [],
         },
     },
-    setup() {
+    setup(props) {
         const store = useStore();
         let clickedColumns = [];
         const clickMusicItem = column => {
@@ -49,7 +49,8 @@ export default defineComponent({
                 Date.now() - clickedColumns[clickedColumns.length - 1].clickTime < 400 &&
                 column.id === clickedColumns[clickedColumns.length - 1].id
             ) {
-                store.commit("changeCurrentMusicDetail",column);
+                store.commit("changeCurrentMusicDetail", column);
+                store.commit("changeCurrentPlayList", props.dataSource);
                 store.dispatch("getCurrentMusicUrlInfo", { id: column.id });
                 return (clickedColumns = []);
             }

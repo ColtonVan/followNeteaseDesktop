@@ -28,7 +28,7 @@
                 @click="colVisible = true"
                 class="collectList ms-3 rounded-pill px-5 border d-flex align-items-center cursor-pointer hover-btn"
             >
-                <CollectList width="20" height="20" />
+                <CollectListIcon width="20" height="20" />
                 <span class="ms-2">收藏全部</span>
             </div>
         </div>
