@@ -9,7 +9,7 @@
                 >首
             </div>
             <div class="rightBtns d-flex align-items-center">
-                <div class="hover-opacity">
+                <div @click="currentPlayList.length ? (colVisible = true) : false" class="hover-opacity">
                     <CollectListIcon width="18" height="18" /><span class="ms-2">收藏全部</span>
                 </div>
                 <div style="height: 12px;" class="ms-5 border-end"></div>
@@ -20,23 +20,19 @@
         </div>
         <div class="list hideScrollBar" v-if="currentPlayList.length">
             <div @click="clickMusicItem(item)" class="row ps-3" v-for="item in currentPlayList" :key="item.id">
-                <div class="col d-flex">
+                <div class="col d-flex" :title="item.name">
                     <div class="playIcon flex-center">
                         <span v-show="currentMusicDetail.id === item.id">
-                            <DownArrowIcon
-                                v-if="isMusicPlaying"
-                                :color="themeColor"
-                                style="transform: rotate(-90deg);"
-                                width="14"
-                                height="14"
-                            />
+                            <DownArrowIcon v-if="isMusicPlaying" :color="themeColor" style="transform: rotate(-90deg);" width="14" height="14" />
                             <PauseIcon v-else :color="themeColor" width="14" height="14" />
                         </span>
                     </div>
-                    <span class="ms-2">{{ item.name }}</span>
+                    <span :style="{ opacity: item.haveUrl === false ? 0.4 : 1 }" class="ms-2 text-ellipsis">{{ item.name }}</span>
                 </div>
-                <div class="col">{{ item.ar.map(item => item.name).join("、") }}</div>
-                <div class="col text-muted">{{ playTime(item.dt) }}</div>
+                <div :style="{ opacity: item.haveUrl === false ? 0.4 : 1 }" :title="item.ar.map(item => item.name).join('、')" class="col">
+                    {{ item.ar.map(item => item.name).join("、") }}
+                </div>
+                <div :style="{ opacity: item.haveUrl === false ? 0.4 : 1 }" class="col text-muted">{{ playTime(item.dt) }}</div>
             </div>
         </div>
 
@@ -53,6 +49,10 @@
                 >
             </div>
         </div>
+        <CommonModal v-model:visible="commonModalVisible">
+            <div class="text-center">由于版权保护，您所在的地区暂时无法使用。</div>
+        </CommonModal>
+        <CollectionListModal :tracks="currentPlayList.map(item => item.id).reverse()" v-model:visible="colVisible" />
     </div>
 </template>
 
@@ -61,20 +61,16 @@ import { useStore } from "vuex";
 import { computed, defineComponent, reactive, toRefs, watch } from "vue";
 import useClickDocument from "@/hooks/useClickDocument";
 import { playTime } from "@/hooks/useFilters";
-import HollowPlayIcon from "../svgIcons/HollowPlayIcon.vue";
-import PlayListIcon from "../svgIcons/PlayListIcon.vue";
 export default defineComponent({
-    components: { HollowPlayIcon, PlayListIcon },
     setup() {
         const store = useStore();
-        watch(()=>store.state.isMusicPlaying,newV=>{
-            console.log(newV)
-        })
         const state = reactive({
             currentPlayList: computed(() => store.state.currentPlayList),
             themeColor: computed(() => store.getters.getThemeColor),
             currentMusicDetail: computed(() => store.state.currentMusicDetail),
             isMusicPlaying: computed(() => store.state.isMusicPlaying),
+            commonModalVisible: false,
+            colVisible: false,
         });
         useClickDocument(() => {
             store.commit("changeShowPlayList", false);
@@ -86,8 +82,12 @@ export default defineComponent({
                 Date.now() - clickedColumns[clickedColumns.length - 1].clickTime < 400 &&
                 column.id === clickedColumns[clickedColumns.length - 1].id
             ) {
-                store.commit("changeCurrentMusicDetail", column);
-                store.dispatch("getCurrentMusicUrlInfo", { id: column.id });
+                if (column.haveUrl !== false) {
+                    store.commit("changeCurrentMusicDetail", column);
+                    store.dispatch("getCurrentMusicUrlInfo", { id: column.id });
+                } else {
+                    state.commonModalVisible = true;
+                }
                 return (clickedColumns = []);
             }
             column.clickTime = Date.now();

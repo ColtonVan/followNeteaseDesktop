@@ -1,7 +1,7 @@
 <template>
     <teleport to="body" v-if="visible">
         <div
-            class="commonToast position-absolute top-50 start-50 translate-middle rounded-8 d-flex justify-content-center align-items-center"
+            class="commonToast position-absolute top-50 start-50 translate-middle rounded-8 d-flex px-5 justify-content-center align-items-center"
             :class="{ closeToast: startCloseAni }"
         >
         <span class="me-3" v-if="icon === 'success'">
@@ -70,7 +70,7 @@ export default defineComponent({
 <style scoped lang="scss">
 .commonToast {
     z-index: 999999;
-    width: 320px;
+    min-width: 320px;
     height: 96px;
     background-color: rgba($color: #000000, $alpha: 0.8);
 }

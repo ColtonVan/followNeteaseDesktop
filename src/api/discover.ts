@@ -16,7 +16,7 @@ export const getRecommendSongsApi = (params?: ListParams) => {
     return get("/recommend/songs", { params: params || {} });
 };
 export const getSongDetail = (ids: number | string | number[] | string[] = "") => {
-    return get("/song/detail", { params: { ids } });
+    return get("/song/detail", { params: { ids: ids instanceof Array ? String(ids) : ids } });
 };
 export const getSongUrl = (id: number | string | number[] | string[] = "") => {
     return get("/song/url", { params: { id } });

@@ -1,6 +1,6 @@
 <template>
     <teleport to=".main" v-if="modalVisible && canRender">
-        <div ref="modalRef" class="CommonModal d-flex flex-column align-items-center bg-white">
+        <div @click.stop ref="modalRef" class="CommonModal d-flex flex-column align-items-center bg-white">
             <div ref="dragRef" class="cursor-move title d-flex justify-content-center align-items-end">
                 <div class="fs-5">{{ title }}</div>
                 <CloseIcon @click="modalVisible = false" class="cursor-pointer" width="20px" height="20px" />
@@ -11,7 +11,14 @@
                 </div>
                 <div>
                     <slot v-if="$slots.buttons" name="buttons" />
-                    <div v-else @click="$emit('confirm')" class="okBtn cursor-pointer d-flex justify-content-center align-items-center">
+                    <div
+                        v-else
+                        @click="
+                            $emit('confirm');
+                            $emit('update:visible', false);
+                        "
+                        class="okBtn cursor-pointer d-flex justify-content-center align-items-center"
+                    >
                         {{ okText }}
                     </div>
                 </div>

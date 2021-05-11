@@ -16,7 +16,8 @@ const store = createStore({
         currentMusicUrlInfo: [],
         currentPlayList: [],
         isMusicPlaying: false,
-        showPlayList: false
+        showPlayList: false,
+        loginModalVisible: false
     },
     getters: {
         getTheme(state) {
@@ -29,9 +30,12 @@ const store = createStore({
                 case "darkTheme":
                     return "#212529";
                 case "freeTheme":
-                    return "#50c475"
+                    return "#50c475";
             }
-        }
+        },
+        getLoginStatus(state) {
+            return !!(state.userInfo as any).userId;
+        },
     },
     mutations: {
         changeTheme(state, val) {
@@ -73,13 +77,16 @@ const store = createStore({
         changeCurrentPlayList(state, val) {
             localStorage["currentPlayList"] = JSON.stringify(val);
             state.currentPlayList = val;
+        },
+        changeLoginModalVisible(state,val){
+            state.loginModalVisible = val;
         }
     },
     actions: {
         getUserInfo({ commit }, params) {
             getAccountInfo().then((res: any) => {
                 if (res.code === 200) {
-                    commit("changeUserInfo", res.profile);
+                    commit("changeUserInfo", res.profile || {});
                 }
             });
         },
@@ -101,7 +108,7 @@ const store = createStore({
         async getCreatedMusicList({ commit }, params) {
             return await getUserPlayList().then((res: any) => {
                 if (res.code === 200) {
-                    commit("changeCreatedMusicList", res.playlist);
+                    commit("changeCreatedMusicList", res.playlist || []);
                 }
             });
         },
@@ -112,8 +119,31 @@ const store = createStore({
                     localStorage["currentMusicUrlInfo"] = JSON.stringify(res.data);
                     return res.data;
                 }
-            })
-        }
+            });
+        },
+        async addHaveUrl({ commit, state }, params) {
+            if (state.currentPlayList && state.currentPlayList.length) {
+                let ids = state.currentPlayList.map(item => item.id);
+                let ectypalPlayList = [...state.currentPlayList];
+                return await getSongUrlApi({ id: ids }).then((res: any) => {
+                    if (res.code === 200) {
+                        ectypalPlayList.forEach(musicItem => {
+                            res.data.forEach(urlItem => {
+                                if (urlItem.id === musicItem.id) {
+                                    if (urlItem.url) {
+                                        musicItem.haveUrl = true;
+                                    } else {
+                                        musicItem.haveUrl = false;
+                                    }
+                                }
+                            });
+                        });
+                        commit("changeCurrentPlayList", ectypalPlayList);
+                        return ectypalPlayList;
+                    }
+                });
+            }
+        },
     },
     modules: {},
 });

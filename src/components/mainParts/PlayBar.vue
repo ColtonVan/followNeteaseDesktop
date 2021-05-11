@@ -1,23 +1,25 @@
 <template>
     <div class="playBar border-top position-absolute bottom-0 vw-100 d-flex align-items-center justify-content-between">
         <audio class="d-none" ref="audioTag" :muted="musicMuted" controls :src="currentMusicUrl"></audio>
-        <div class="ps-3 d-flex align-items-center cursor-pointer">
-            <div class="musicCoverBox rounded-4 overflow-hidden position-relative">
+        <div class="leftMusicInfo ps-3 d-flex align-items-center cursor-pointer">
+            <div class="musicCoverBox rounded-4 overflow-hidden position-relative flex-shrink-0">
                 <img :src="currentMusicDetail.al.picUrl" width="55" alt="" />
             </div>
             <div class="ms-3 fs-5">
                 <div class="d-flex align-items-center">
-                    <span>{{ currentMusicDetail.name }}</span>
-                    <LikedIcon class="ms-2 cursor-pointer" width="16" height="16" />
+                    <span class="musicName text-ellipsis" :title="currentMusicDetail.name">{{ currentMusicDetail.name }}</span>
+                    <LikedIcon v-if="loginStatus" class="ms-2 cursor-pointer" width="16" height="16" />
                 </div>
                 <div class="mt-1">
-                    <span>{{ currentMusicDetail.ar.map(item => item.name).join("、") }}</span>
+                    <span class="musicAr text-ellipsis" :title="currentMusicDetail.ar.map(item => item.name).join('、')">{{
+                        currentMusicDetail.ar.map(item => item.name).join("、")
+                    }}</span>
                 </div>
             </div>
         </div>
         <div class="centerController">
-            <div class="changeMusicArea flex-center">
-                <div title="上一首">
+            <div @click.stop class="changeMusicArea flex-center">
+                <div @click="changeMusic('previous')" title="上一首">
                     <PreMusicIcon
                         @mouseenter="preMusicIconColor = themeColor"
                         @mouseleave="preMusicIconColor = '#000000'"
@@ -30,7 +32,7 @@
                     <PauseIcon @click="pauseMusic" v-if="isPlaying" width="20" height="20" />
                     <DownArrowIcon @click="playMusic" v-else width="22" height="22" class="filter-invert-1 playIcon" />
                 </div>
-                <div title="下一首">
+                <div @click="changeMusic('next')" title="下一首">
                     <NextMusicIcon
                         @mouseenter="nextMusicIconColor = themeColor"
                         @mouseleave="nextMusicIconColor = '#000000'"
@@ -71,12 +73,7 @@
                     height="28"
                 />
             </div>
-            <ProgressBar
-                v-model="volumeProgress"
-                @change="changeVolumeProgress"
-                width="60px"
-                :title="`${volumeProgress.toFixed()}%`"
-            />
+            <ProgressBar v-model="volumeProgress" @change="changeVolumeProgress" width="60px" :title="`${volumeProgress.toFixed()}%`" />
             <PlayListIcon
                 @click.stop="$store.commit('changeShowPlayList', !$store.state.showPlayList)"
                 class="ms-4 cursor-pointer opacity-75 hover-opacity"
@@ -110,29 +107,26 @@ export default defineComponent({
             nextMusicIconColor: "#000000",
             themeColor: computed(() => store.getters.getThemeColor),
             isPlaying: computed(() => store.state.isMusicPlaying),
-            currentMusicUrl:
-                store.state.currentMusicUrlInfo && store.state.currentMusicUrlInfo.length
-                    ? store.state.currentMusicUrlInfo[0].url
-                    : "",
+            currentMusicUrl: store.state.currentMusicUrlInfo && store.state.currentMusicUrlInfo.length ? store.state.currentMusicUrlInfo[0].url : "",
+            currentPlayList: computed(() => store.state.currentPlayList),
             audioTag: null,
             toastRef: null,
             musicTimeLength: 0,
             musicCurrentTime: 0,
             musicMuted: false,
+            loginStatus: computed(() => store.getters.getLoginStatus),
         });
         const playMusic = () => {
+            if (!state.currentMusicUrl) {
+                return state.toastRef.warn("请先选择要播放的音乐");
+            }
             nextTick(() => {
-                setTimeout(() => {
-                    state.audioTag.addEventListener("timeupdate", event => {
-                        state.musicCurrentTime = event.target.currentTime * 1000;
-                        state.mtProgress = (100 * event.target.currentTime) / event.target.duration;
-                    });
-                    state.audioTag.onerror = err => {
-                        state.toastRef.warn("播放失败，请稍后重试");
-                    };
-                    state.audioTag.play();
-                    store.commit("changeIsMusicPlaying", true);
-                }, 140);
+                state.audioTag.play().catch(err => {
+                    state.toastRef.warn(err.message);
+                    setTimeout(() => {
+                        store.commit("changeIsMusicPlaying", false);
+                    }, 600);
+                });
             });
         };
         const pauseMusic = () => {
@@ -156,10 +150,63 @@ export default defineComponent({
                 }
             }
         );
+        const changeMusic = (type: "next" | "previous") => {
+            pauseMusic();
+            if (state.currentPlayList && state.currentPlayList.length) {
+                //设置默认为第一首
+                let futureMusicObj = state.currentPlayList[0];
+                state.currentPlayList.some((item, index, arr) => {
+                    if (state.currentMusicDetail.id === item.id) {
+                        if (type === "next") {
+                            if (index === arr.length - 1) {
+                                futureMusicObj = arr[0];
+                            } else {
+                                futureMusicObj = arr[index + 1];
+                            }
+                        } else if (type === "previous") {
+                            if (index === 0) {
+                                futureMusicObj = arr[arr.length - 1];
+                            } else {
+                                futureMusicObj = arr[index - 1];
+                            }
+                        }
+                        return true;
+                    }
+                });
+                store.commit("changeCurrentMusicDetail", futureMusicObj);
+                if (futureMusicObj.haveUrl === false) {
+                    state.toastRef.warn("当前歌曲由于版权保护，您所在的地区暂时无法使用。");
+                    setTimeout(() => {
+                        changeMusic(type);
+                    }, 400);
+                    return;
+                }
+                store.dispatch("getCurrentMusicUrlInfo", { id: futureMusicObj.id });
+            } else {
+                state.toastRef.warn("请添加音乐至播放列表");
+            }
+        };
         onMounted(() => {
             //在第一帧数据加载完成后触发
             state.audioTag.onloadeddata = () => {
                 state.musicTimeLength = state.audioTag.duration * 1000;
+            };
+            //播放时不停触发
+            state.audioTag.ontimeupdate = event => {
+                state.musicCurrentTime = event.target.currentTime * 1000;
+                state.mtProgress = (100 * event.target.currentTime) / event.target.duration;
+            };
+            //开始播放时触发
+            state.audioTag.onplay = () => {
+                store.commit("changeIsMusicPlaying", true);
+            };
+            //播放出错时触发
+            state.audioTag.onerror = (err: Error) => {
+                state.toastRef.warn("播放失败，请稍后重试");
+            };
+            //当前歌曲播放完毕时触发
+            state.audioTag.onended = () => {
+                changeMusic("next");
             };
         });
         return {
@@ -169,6 +216,7 @@ export default defineComponent({
             pauseMusic,
             changeMtProgress,
             changeVolumeProgress,
+            changeMusic,
         };
     },
 });
@@ -177,9 +225,18 @@ export default defineComponent({
 <style scoped lang="scss">
 .playBar {
     height: 75px;
-    .musicCoverBox {
-        width: 55px;
-        height: 55px;
+    .leftMusicInfo {
+        width: 260px;
+        .musicCoverBox {
+            width: 55px;
+            height: 55px;
+        }
+        .musicName {
+            max-width: 240px;
+        }
+        .musicAr {
+            max-width: 240px;
+        }
     }
     .centerController {
         .changeMusicArea {

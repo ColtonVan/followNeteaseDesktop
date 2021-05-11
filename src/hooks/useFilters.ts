@@ -1,3 +1,4 @@
+import { getSongUrlApi } from "@/api/song";
 export const playCount = (count: number) => {
     if (count >= 100000000) {
         return (count / 100000000).toFixed(1) + "亿";
@@ -28,4 +29,22 @@ export const YYYYMMDD = () => {
     let MM = String(currentDate.getMonth() + 1).padStart(2, "0");
     let DD = String(currentDate.getDate()).padStart(2, "0");
     return `${YYYY}-${MM}-${DD}`;
+};
+export const addHaveUrl = async originalList => {
+    return await getSongUrlApi({ id: originalList.map(item => item.id) }).then((res: any) => {
+        if (res.code === 200) {
+            res.data.forEach(dataItem => {
+                originalList.forEach(track => {
+                    if (dataItem.id === track.id) {
+                        if (dataItem.url) {
+                            track.haveUrl = true;
+                        } else {
+                            track.haveUrl = false;
+                        }
+                    }
+                });
+            });
+            return originalList;
+        }
+    });
 };

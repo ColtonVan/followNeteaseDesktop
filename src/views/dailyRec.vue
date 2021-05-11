@@ -24,10 +24,7 @@
                     <PlusIcon width="20" height="20" />
                 </div>
             </div>
-            <div
-                @click="colVisible = true"
-                class="collectList ms-3 rounded-pill px-5 border d-flex align-items-center cursor-pointer hover-btn"
-            >
+            <div @click="colVisible = true" class="collectList ms-3 rounded-pill px-5 border d-flex align-items-center cursor-pointer hover-btn">
                 <CollectListIcon width="20" height="20" />
                 <span class="ms-2">收藏全部</span>
             </div>
@@ -39,28 +36,15 @@
     <CommonModal v-model:visible="downloadModalVisible">
         <template #default>
             <div class="d-flex justify-content-center">
-                <div
-                    v-for="(item, index) in songsUrlObjArr"
-                    :key="index"
-                    class="d-flex align-items-center cursor-pointer"
-                >
-                    <input
-                        type="radio"
-                        :name="item.level"
-                        :id="item.level"
-                        v-model="item.checked"
-                        :checked="item.checked"
-                    />
+                <div v-for="(item, index) in songsUrlObjArr" :key="index" class="d-flex align-items-center cursor-pointer">
+                    <input type="radio" :name="item.level" :id="item.level" v-model="item.checked" :checked="item.checked" />
                     <label class="ms-3" :for="item.level">{{ musicQuality(item.level) }}</label>
                 </div>
             </div>
         </template>
         <template #buttons>
             <div class="d-flex justify-content-center">
-                <div
-                    @click="confirmDownload"
-                    class="okBtn cursor-pointer d-flex justify-content-center align-items-center"
-                >
+                <div @click="confirmDownload" class="okBtn cursor-pointer d-flex justify-content-center align-items-center">
                     确定
                 </div>
                 <div
@@ -73,14 +57,14 @@
         </template>
     </CommonModal>
     <CommonToast ref="commonToast" />
-    <CollectionListModal :tracks="dailySongs.map(item => item.id)" v-model:visible="colVisible" />
+    <CollectionListModal :tracks="dailySongs.map(item => item.id)" v-model:visible="colVisible" :defaultListName="defaultListName"/>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, toRefs, watch } from "vue";
 import { getRecommendSongsApi, getSongDetail, getSongUrl, likeMusic } from "@/api/discover";
 import { getLikeList as getLikeListApi } from "@/api/login";
-import { playTime } from "@/hooks/useFilters";
+import { playTime, addHaveUrl } from "@/hooks/useFilters";
 import { useStore } from "vuex";
 import { downloadMusic as downloadMusicFun } from "@/utils/file";
 import { musicQuality } from "@/hooks/useFilters";
@@ -122,7 +106,10 @@ export default defineComponent({
                         return playTime(text);
                     },
                 },
-            ]
+            ],
+            defaultListName: `每日歌曲推荐(${new Date().getFullYear()}.${String(new Date().getMonth() + 1).padStart(2, "0")}.${String(
+                new Date().getDate()
+            ).padStart(2, "0")})`,
         });
         watch(
             () => state.songsUrlObjArr,
@@ -132,9 +119,9 @@ export default defineComponent({
         );
         const getRec = () => {
             return new Promise((resolve, reject) => {
-                getRecommendSongsApi({ t: Date.now() }).then((res: AxiosResponseProps) => {
+                getRecommendSongsApi({ t: Date.now() }).then(async (res: AxiosResponseProps) => {
                     if (res.code === 200) {
-                        state.dailySongs = res.data.dailySongs;
+                        state.dailySongs = await addHaveUrl(res.data.dailySongs);
                         resolve(res);
                     }
                 });
@@ -153,11 +140,7 @@ export default defineComponent({
         };
         getLikeList();
         const calendarColor = computed(() =>
-            store.getters.getTheme === "primaryTheme"
-                ? "#ec4141"
-                : store.getters.getTheme === "darkTheme"
-                ? "#212529"
-                : "#50c475"
+            store.getters.getTheme === "primaryTheme" ? "#ec4141" : store.getters.getTheme === "darkTheme" ? "#212529" : "#50c475"
         );
         const tryDownloadMusic = item => {
             state.currentMusicObj = item;
@@ -182,13 +165,11 @@ export default defineComponent({
         const collectMusic = (item, like) => {
             likeMusic({ id: item.id, like }).then((res: any) => {
                 if (res.code === 200) {
-                    Promise.all([getRec(), getLikeList()]).then(
-                        ([res1, res2]: [AxiosResponseProps, AxiosResponseProps]) => {
-                            if (res1.code === 200 && res2.code === 200) {
-                                state.commonToast.success(like ? "已添加到我喜欢的音乐" : "取消喜欢成功");
-                            }
+                    Promise.all([getRec(), getLikeList()]).then(([res1, res2]: [AxiosResponseProps, AxiosResponseProps]) => {
+                        if (res1.code === 200 && res2.code === 200) {
+                            state.commonToast.success(like ? "已添加到我喜欢的音乐" : "取消喜欢成功");
                         }
-                    );
+                    });
                 }
             });
         };

@@ -12,7 +12,7 @@
                 <span class="text-muted">{{ YYYYMMDD(playListDetail.createTime) }}创建</span>
             </div>
             <div class="mt-4">
-                <PlayAllListBtn />
+                <PlayAllListBtn :musicList="playListDetail.tracks" />
             </div>
             <div class="mt-4">
                 <span class="me-3"
@@ -26,7 +26,6 @@
     </div>
     <HorizontalNav v-model:navs="navs" class="pb-2" />
     <MusicList v-if="navs.find(item => item.active).key === 0" :columns="columns" :dataSource="playListDetail.tracks" />
-    
 </template>
 
 <script lang="ts">
@@ -34,10 +33,13 @@ import { computed, defineComponent, reactive, toRefs, watch, watchEffect } from 
 import { getPlayListDetailApi } from "@/api/playList";
 import { AxiosResponseProps } from "@/utils/request";
 import { useRoute } from "vue-router";
-import { playTime, YYYYMMDD } from "@/hooks/useFilters";
+import { playTime, YYYYMMDD, addHaveUrl } from "@/hooks/useFilters";
+import { useStore } from "vuex";
+import { getSongUrlApi } from "@/api/song";
 export default defineComponent({
     setup() {
         const route = useRoute();
+        const store = useStore();
         const state = reactive({
             columns: [
                 {
@@ -66,7 +68,7 @@ export default defineComponent({
                     },
                 },
             ],
-            playListDetail: {},
+            playListDetail: { coverImgUrl: "https://p1.music.126.net/jWE3OEZUlwdz0ARvyQ9wWw==/109951165474121408.jpg" },
             navs: [
                 {
                     title: "歌曲列表",
@@ -74,7 +76,7 @@ export default defineComponent({
                     key: 0,
                 },
                 {
-                    title: computed(() => `评论(${state.playListDetail.commentCount})`),
+                    title: computed(() => `评论(${state.playListDetail.commentCount || 0})`),
                     key: 1,
                 },
                 {
@@ -84,9 +86,9 @@ export default defineComponent({
             ],
         });
         const getPlayListDetail = id => {
-            getPlayListDetailApi({ id, t: Date.now() }).then((res: any) => {
+            getPlayListDetailApi({ id, t: Date.now() }).then(async (res: any) => {
                 if (res.code === 200) {
-                    state.playListDetail = res.playlist;
+                    state.playListDetail = { ...res.playlist, tracks: await addHaveUrl(res.playlist.tracks) };
                 }
             });
         };

@@ -40,8 +40,10 @@ export const dailySignin = () => {
 };
 export const getUserPlayList = () => {
     return getAccountInfo().then(async (res: any) => {
-        if (res.code === 200) {
+        if (res.code === 200 && res.account && res.account.id) {
             return await axiosInstance.get("/user/playlist", { params: { uid: res.account.id, t: Date.now() } });
+        } else {
+            return { code: 200 };
         }
     });
 };

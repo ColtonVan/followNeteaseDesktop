@@ -90,7 +90,10 @@ export default defineComponent({
             isFullScreen: computed(() => store.state.fullScreen),
             themePanelVisible: false,
             closeModalVisible: false,
-            loginModalVisible: false,
+            loginModalVisible: computed({
+                get: () => store.state.loginModalVisible,
+                set: newV => store.commit("changeLoginModalVisible", newV),
+            }),
             userInfoModalVisible: false,
             searchHistoryVisible: false,
             closeTipsText: "",

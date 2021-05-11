@@ -28,7 +28,12 @@
                 <DownArrowIcon :class="{ createdCollapsed }" class="downArrow" color="rgba(0, 0, 0, 0.5)" width="10px" height="10px" />
             </div>
             <div title="新建歌单">
-                <PlusIcon @click.stop="addListModalVisible = true" width="15" height="15" class="plusIcon me-5" />
+                <PlusIcon
+                    @click.stop="loginStatus === true ? (addListModalVisible = true) : $store.commit('changeLoginModalVisible', true)"
+                    width="15"
+                    height="15"
+                    class="plusIcon me-5"
+                />
             </div>
         </div>
 
@@ -62,7 +67,7 @@
 
             <div
                 class="mt-1 p-2 cursor-pointer rounded likedMusic d-flex align-items-center"
-                v-for="menu in menuList.filter(item => item.type === 'created')"
+                v-for="menu in menuList.filter(item => item.type === 'created').slice(1)"
                 :key="menu.key"
                 :class="{ visitedMenu: menu.active, 'hover-menuItem': canMyLikeHover }"
                 :title="menu.name"
@@ -77,7 +82,8 @@
                     clickMenuItem(menu);
                 "
             >
-                <MusicListIcon class="me-2" width="20" height="20" />
+                <MusicListIcon v-if="menu.privacy === 0" class="me-2 flex-shrink-0" width="20" height="20" />
+                <ListLockIcon v-if="menu.privacy === 10" class="me-2 flex-shrink-0" width="17" height="17" />
                 <span class="text-ellipsis">{{ menu.name }}</span>
             </div>
         </div>
@@ -116,34 +122,15 @@
                     clickMenuItem(menu);
                 "
             >
-                <MusicListIcon class="me-2" width="20" height="20" />
+                <MusicListIcon class="me-2 flex-shrink-0" width="20" height="20" />
                 <span class="text-ellipsis">{{ menu.name }}</span>
             </div>
         </div>
     </div>
 
-    <CommonModal title="新建歌单" v-model:visible="addListModalVisible">
-        <template #default>
-            <input
-                @keyup.enter="keyupNmaeInput"
-                class="listNameInput py-2 px-3 rounded mb-2"
-                v-model="addMusicListObj.name"
-                type="text"
-                placeholder="请输入新歌单标题"
-            />
-            <label for="isPrivate" class="d-flex align-items-center fs-5">
-                <input class="me-2" type="checkbox" v-model="addMusicListObj.isPrivate" name="isPrivate" id="isPrivate" />
-                设置为隐私歌单
-            </label>
-        </template>
-        <template #buttons>
-            <div @click="createList" class="okBtn cursor-pointer d-flex justify-content-center align-items-center">
-                创建
-            </div>
-        </template>
-    </CommonModal>
+    <CreateMusicListForm v-model:visible="addListModalVisible" v-model:formData="addMusicListObj" @complete="completeCreate" />
 
-    <CommonToast ref="commonModalRef" />
+    <CommonToast ref="commonToastRef" />
 </template>
 
 <script lang="ts">
@@ -196,7 +183,7 @@ export default defineComponent({
                 name: "",
                 isPrivate: false,
             },
-            commonModalRef: ref(null),
+            commonToastRef: ref(null),
             createdMusicList: computed(() => store.state.createdMusicList.filter(item => item.creator.userId === userId.value)),
             collectedMusicList: computed(() => store.state.createdMusicList.filter(item => item.creator.userId !== userId.value)),
             menuList: [...initMenuList],
@@ -204,7 +191,7 @@ export default defineComponent({
         watch(
             () => state.createdMusicList,
             newV => {
-                if (newV && newV.length) {
+                if (newV instanceof Array) {
                     state.menuList = [
                         ...initMenuList,
                         ...newV.map(item => ({ ...item, key: item.id, type: "created" })),
@@ -221,32 +208,23 @@ export default defineComponent({
                 router.push(menuItem.path);
             }
         };
-        const createList = () => {
-            const { name, isPrivate } = state.addMusicListObj;
-            let params: { name: string; privacy?: number } = { name };
-            if (isPrivate) params.privacy = 10;
-            createPlayListApi(params).then((res: AxiosResponseProps) => {
-                if (res.code === 200) {
-                    store.dispatch("getCreatedMusicList").then(() => {
-                        state.addListModalVisible = false;
-                        state.commonModalRef.success("创建歌单成功");
-                        state.addMusicListObj.name = "";
-                    });
-                }
-            });
-        };
         const getCreatedMusicList = () => {
             store.dispatch("getCreatedMusicList");
         };
         getCreatedMusicList();
-        const keyupNmaeInput = e => {
-            createList();
+        watch(
+            () => store.getters.getLoginStatus,
+            status => {
+                getCreatedMusicList();
+            }
+        );
+        const completeCreate = () => {
+            state.commonToastRef.success("创建歌单成功");
         };
         return {
             ...toRefs(state),
-            keyupNmaeInput,
             clickMenuItem,
-            createList,
+            completeCreate,
             window,
         };
     },
@@ -292,43 +270,6 @@ export default defineComponent({
         &:hover {
             background-color: #f3f3f3;
         }
-    }
-}
-.listNameInput {
-    outline: none !important;
-    width: 100%;
-    border: 1px solid #cecece;
-    &::placeholder {
-        color: #cecece;
-    }
-}
-.okBtn {
-    width: 106px;
-    height: 38px;
-    border-radius: 20px;
-    position: absolute;
-    left: 50%;
-    bottom: 0;
-    transform: translateX(-50%);
-    color: #fff;
-    background-color: $primary;
-    &:hover {
-        filter: invert(0.08);
-    }
-}
-.primaryTheme {
-    .okBtn {
-        background-color: $primary;
-    }
-}
-.darkTheme {
-    .okBtn {
-        background-color: $dark;
-    }
-}
-.freeTheme {
-    .okBtn {
-        background-color: $free;
     }
 }
 </style>

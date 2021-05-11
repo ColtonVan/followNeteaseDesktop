@@ -1,43 +1,42 @@
 <template>
-    <div
-        v-if="modalVisible"
-        ref="collectionListModalRef"
-        class="collectionListModal position-absolute translate-middle bg-white shadow rounded"
-    >
-        <div
-            ref="dragDomRef"
-            class="title cursor-move w-100 d-flex justify-content-center align-items-center fs-5 fw-bold"
-        >
-            <CloseIcon @click="modalVisible = false" class="cursor-pointer" width="18" height="18" />
-            <div>收藏到歌单</div>
-        </div>
-        <div class="createdList overflow-scroll hideScrollBar">
-            <div @click="createListAndAdd" class="px-3 py-2 d-flex align-items-center cursor-pointer createdItem">
+    <teleport to=".main" v-if="modalVisible">
+        <div @click.stop ref="collectionListModalRef" class="collectionListModal position-absolute translate-middle bg-white shadow rounded">
+            <div ref="dragDomRef" class="title cursor-move w-100 d-flex justify-content-center align-items-center fs-5 fw-bold">
+                <CloseIcon @click="modalVisible = false" class="cursor-pointer" width="18" height="18" />
+                <div>收藏到歌单</div>
+            </div>
+            <div class="createdList overflow-scroll hideScrollBar">
                 <div
-                    class="createNewItemImg rounded me-3 d-flex justify-content-center align-items-center"
-                    style="height:56px;width:56px;"
+                    @click="
+                        defaultListName ? createListAndAdd() : (modalVisible = false);
+                        addListModalVisible = true;
+                    "
+                    class="px-3 py-2 d-flex align-items-center cursor-pointer createdItem"
                 >
-                    <PlusIcon color="#ec4141" width="34" height="34" />
+                    <div class="createNewItemImg rounded me-3 d-flex justify-content-center align-items-center" style="height:56px;width:56px;">
+                        <PlusIcon :color="themeColor" width="34" height="34" />
+                    </div>
+                    <div>
+                        <div>创建为新歌单</div>
+                    </div>
                 </div>
-                <div>
-                    <div>创建为新歌单</div>
-                </div>
-            </div>
-            <div
-                class="px-3 py-2 d-flex align-items-center cursor-pointer hover-createdItem createdItem"
-                v-for="(item, index) in createdList"
-                :key="index"
-                @click="addToList(item)"
-            >
-                <img class="rounded me-3" width="56" :src="item.coverImgUrl" alt="" />
-                <div>
-                    <div>{{ item.name }}</div>
-                    <div class="text-muted mt-1">{{ item.trackCount }}首音乐</div>
+                <div
+                    class="px-3 py-2 d-flex align-items-center cursor-pointer hover-createdItem createdItem"
+                    v-for="(item, index) in createdList"
+                    :key="index"
+                    @click="addToList(item)"
+                >
+                    <img class="rounded me-3" width="56" :src="item.coverImgUrl" alt="" />
+                    <div>
+                        <div>{{ item.name }}</div>
+                        <div class="text-muted mt-1">{{ item.trackCount }}首音乐</div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </teleport>
     <CommonToast ref="toastRef" />
+    <CreateMusicListForm v-model:visible="addListModalVisible" v-model:formData="addMusicListObj" @complete="completeCreate" />
 </template>
 
 <script lang="ts">
@@ -57,6 +56,10 @@ export default defineComponent({
             type: Array as PropType<number[] | string[] | any[]>,
             default: [],
         },
+        defaultListName: {
+            type: String,
+            default: "",
+        },
     },
     setup(props, { emit }) {
         const state = reactive({
@@ -68,6 +71,12 @@ export default defineComponent({
                 set: newV => emit("update:visible", newV),
             }),
             toastRef: ref(null),
+            themeColor: computed(() => store.getters.getThemeColor),
+            addListModalVisible: false,
+            addMusicListObj: {
+                name: "",
+                isPrivate: false,
+            },
         });
         const collectionListModalRef = ref(null);
         const dragDomRef = ref(null);
@@ -104,21 +113,20 @@ export default defineComponent({
             });
         };
         const createListAndAdd = () => {
-            let nowDate = new Date();
             try {
                 createPlayListApi({
-                    name: `每日歌曲推荐(${nowDate.getFullYear()}.${String(nowDate.getMonth() + 1).padStart(
-                        2,
-                        "0"
-                    )}.${String(nowDate.getDate()).padStart(2, "0")})`,
+                    name: props.defaultListName as string,
                 }).then((res: any) => {
                     if (res.code === 200) {
-                        addToList(res.id);
+                        addToList({ id: res.id });
                     }
                 });
             } catch (err) {
                 state.toastRef.warn("收藏失败");
             }
+        };
+        const completeCreate = listObj => {
+            addToList(listObj);
         };
         return {
             ...toRefs(state),
@@ -126,6 +134,7 @@ export default defineComponent({
             dragDomRef,
             createListAndAdd,
             addToList,
+            completeCreate,
         };
     },
 });
