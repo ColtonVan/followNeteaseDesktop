@@ -5,7 +5,7 @@ import { createStore } from "vuex";
 
 const store = createStore({
     state: {
-        theme: "primaryTheme",
+        theme: "freeTheme",
         fullScreen: false,
         userInfo: {},
         userDetail: { profile: {} },

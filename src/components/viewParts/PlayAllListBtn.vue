@@ -32,7 +32,7 @@ export default defineComponent({
             default: [],
         },
     },
-    setup({ musicList }: { musicList: { id: number }[] }) {
+    setup(props: { musicList: { id: number }[] }) {
         const store = useStore();
         const state = reactive({
             commonModalVisible: null,
@@ -49,11 +49,10 @@ export default defineComponent({
             }
         );
         const confirmPlayAll = () => {
-            console.log(musicList);
-            if (musicList.length) {
-                store.commit("changeCurrentMusicDetail", musicList[0]);
-                store.commit("changeCurrentPlayList", JSON.parse(JSON.stringify(musicList)));
-                store.dispatch("getCurrentMusicUrlInfo", { id: musicList[0].id });
+            if (props.musicList.length) {
+                store.commit("changeCurrentMusicDetail", props.musicList[0]);
+                store.commit("changeCurrentPlayList", JSON.parse(JSON.stringify(props.musicList)));
+                store.dispatch("getCurrentMusicUrlInfo", { id: props.musicList[0].id });
             } else {
                 state.commonToastRef.warn("歌单暂无歌曲，请去添加一些吧~");
             }
@@ -70,7 +69,7 @@ export default defineComponent({
         };
         const addAll = () => {
             let preMusicList = store.state.currentPlayList;
-            store.commit("changeCurrentPlayList", [...preMusicList, ...JSON.parse(JSON.stringify(musicList))]);
+            store.commit("changeCurrentPlayList", [...preMusicList, ...JSON.parse(JSON.stringify(props.musicList))]);
         };
         return {
             ...toRefs(state),
@@ -84,8 +83,8 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .playAllBtn {
-    width: 160px;
-    height: 36px;
+    width: 148px;
+    height: 34px;
     svg:first-of-type {
         transform: rotate(-90deg);
     }

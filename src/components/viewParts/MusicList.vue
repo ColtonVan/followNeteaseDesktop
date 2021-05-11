@@ -6,7 +6,8 @@
             </div>
         </div>
         <div v-if="!dataSource.length" class="w-100 fs-5 text-muted flex-center py-5 border-bottom">
-            <div>暂无数据，快去收藏音乐吧~</div>
+            <!-- <div>暂无数据，快去收藏音乐吧~</div> -->
+            <div>{{emptyText}}</div>
         </div>
         <div
             v-else
@@ -47,6 +48,10 @@ export default defineComponent({
             type: Array as PropType<Partial<{ id: number; name?: string }>[]>,
             default: [],
         },
+        emptyText:{
+            type: String,
+            default: "暂无数据，请浏览其他歌单吧~"
+        }
     },
     setup(props) {
         const store = useStore();
