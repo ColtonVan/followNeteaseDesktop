@@ -10,7 +10,7 @@ const axiosIns: AxiosInstance = axios.create({
     withCredentials: true,
 } as AxiosRequestConfig);
 axiosIns.interceptors.request.use((config: AxiosRequestConfig) => {
-    let ignoreLoadingUrls = ["/login/qr/check"];
+    let ignoreLoadingUrls = ["/login/qr/check", "/search/hot/detail","/search/suggest"];
     if (!ignoreLoadingUrls.includes(config.url)) {
         store.commit("changeIsLoading", true);
     }
@@ -31,6 +31,7 @@ axiosIns.interceptors.response.use(
         return resoponse.data as AxiosResponse<AxiosResponseProps>;
     },
     err => {
+        store.commit("changeIsLoading", false);
         return Promise.reject(err);
     }
 );

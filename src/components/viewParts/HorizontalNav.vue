@@ -23,10 +23,15 @@
 <script lang="ts">
 import { useRouter } from "vue-router";
 import { computed, defineComponent, PropType, reactive, toRefs } from "vue";
+export interface NavsProps {
+    title: string;
+    active?: boolean;
+    path?: string;
+}
 export default defineComponent({
     props: {
         navs: {
-            type: Array as PropType<{ title: string; active?: boolean; path?: string }[]>,
+            type: Array as PropType<NavsProps[]>,
             default: [],
         },
     },

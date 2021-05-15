@@ -32,7 +32,13 @@
                     class="searchInput rounded-pill text-white ms-1"
                     type="text"
                 />
-                <SearchHistoryPanel v-if="searchHistoryVisible" />
+                <SearchHistoryPanel v-model="searchHistoryVisible" v-model:keyword="searchKeyword" v-if="searchHistoryVisible && !searchKeyword.length" />
+                <SearchResultList
+                    v-model="searchHistoryVisible"
+                    v-if="searchHistoryVisible && searchKeyword.length"
+                    :keyword="searchKeyword"
+                    @search="pushKeyword"
+                />
             </div>
         </div>
         <div class="rightArea d-flex align-items-center mx-3">
@@ -138,13 +144,23 @@ export default defineComponent({
                 toggleFullScreen();
             }
         };
+        const pushKeyword = () => {
+            if (!state.searchKeyword) return;
+            let searchHistory = localStorage[searchHistoryKey] ? JSON.parse(localStorage[searchHistoryKey]) : [];
+            for (let i = 0; i < searchHistory.length; i++) {
+                if (searchHistory[i].title === state.searchKeyword) {
+                    searchHistory.splice(i, 1);
+                    i--;
+                }
+            }
+            searchHistory.unshift({ title: state.searchKeyword });
+            localStorage[searchHistoryKey] = JSON.stringify(searchHistory);
+        };
         const SearchKeywordKeyup = e => {
             if (e.keyCode === 13) {
-                if (localStorage[searchHistoryKey]) {
-                    let searchHistory = JSON.parse(localStorage[searchHistoryKey]);
-                    searchHistory.push({ title: state.searchKeyword });
-                    localStorage[searchHistoryKey] = JSON.stringify(searchHistory);
-                }
+                pushKeyword();
+                router.push({ path: "/searchResultDetail", query: { keyword: state.searchKeyword } });
+                state.searchHistoryVisible = false;
             }
         };
         const routeBack = () => {
@@ -158,6 +174,7 @@ export default defineComponent({
             clickNav,
             window,
             routeBack,
+            pushKeyword,
             ...toRefs(state),
         };
     },

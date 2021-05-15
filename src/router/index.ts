@@ -36,6 +36,11 @@ const routes: Array<RouteRecordRaw> = [
                 name: "createdMusicList",
                 component: () => import("@/views/createdMusicList.vue"),
             },
+            {
+                path: "searchResultDetail",
+                name: "searchResultDetail",
+                component: () => import("@/views/searchResultDetail.vue"),
+            },
         ],
     },
 ];

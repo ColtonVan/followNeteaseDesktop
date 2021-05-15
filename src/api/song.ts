@@ -5,3 +5,6 @@ export const getSongUrlApi = params => {
 export const checkMusicApi = params => {
     return axiosInstance.get("/check/music", { params });
 };
+export const getSongDetailApi = (ids: string | number[] | string[]) => {
+    return axiosInstance.get("/song/detail", { params: { ids: ids instanceof Array ? ids.toString() : ids,t:Date.now() } });
+};

@@ -17,7 +17,7 @@ const store = createStore({
         currentPlayList: [],
         isMusicPlaying: false,
         showPlayList: false,
-        loginModalVisible: false
+        loginModalVisible: false,
     },
     getters: {
         getTheme(state) {
@@ -75,12 +75,18 @@ const store = createStore({
             state.showPlayList = val;
         },
         changeCurrentPlayList(state, val) {
-            localStorage["currentPlayList"] = JSON.stringify(val);
-            state.currentPlayList = val;
+            let newList = [];
+            val.forEach((item, index) => {
+                if (!newList.map(listItem => listItem.id).includes(item.id)) {
+                    newList.push(item);
+                }
+            });
+            localStorage["currentPlayList"] = JSON.stringify(newList);
+            state.currentPlayList = newList;
         },
-        changeLoginModalVisible(state,val){
+        changeLoginModalVisible(state, val) {
             state.loginModalVisible = val;
-        }
+        },
     },
     actions: {
         getUserInfo({ commit }, params) {

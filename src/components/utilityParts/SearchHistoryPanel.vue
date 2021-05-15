@@ -1,6 +1,6 @@
 <template>
     <div class="searchHistoryPanel rounded-6 shadow position-absolute start-50 translate-middle-x bg-white">
-        <div class="pt-3 px-4">
+        <div class="pt-3 px-4" v-if="historyList.length">
             <div class="title d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center">
                     <span class="fs-6 text-muted">搜索历史</span>
@@ -10,7 +10,7 @@
                     {{ spreadList ? "收起" : "查看全部" }}
                 </div>
             </div>
-            <div class="historyList d-flex flex-wrap mt-2" :class="{ spreadList }">
+            <div class="historyList d-flex align-items-start flex-wrap mt-2" :class="{ spreadList }">
                 <div
                     v-for="(item, index) in historyList"
                     :key="index"
@@ -27,7 +27,15 @@
             </div>
         </div>
         <div class="fs-6 text-muted mt-3 mb-4 ps-4">热搜榜</div>
-        <div :class="{ frontHotItem: [0, 1, 2].includes(index) }" class="hotItem py-2 d-flex align-items-center cursor-pointer" v-for="(item, index) in hotSearchList" :key="index">
+        <LoadingComponent v-if="isLoading" />
+        <div
+            v-else
+            :class="{ frontHotItem: [0, 1, 2].includes(index) }"
+            class="hotItem py-2 d-flex align-items-center cursor-pointer"
+            v-for="(item, index) in hotSearchList"
+            @click="toSearchResultDetail"
+            :key="index"
+        >
             <div class="flex-center fs-5 fw-bold">{{ index + 1 }}</div>
             <div class="d-flex flex-column">
                 <div class="d-flex align-items-center">
@@ -46,25 +54,51 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from "vue";
+import { defineComponent, reactive, toRefs, watch } from "vue";
 import { getSearchHotDetail as getSearchHotDetailApi } from "@/api/search";
 import { AxiosResponseProps } from "@/utils/request";
+import { useRouter } from "vue-router";
 const searchHistoryKey = "searchHistory";
 export default defineComponent({
-    setup() {
+    props: {
+        modelValue: {
+            type: Boolean,
+            required: true,
+        },
+        keyword: {
+            type: String,
+            required: true,
+        },
+    },
+    setup(props) {
+        const router = useRouter();
         const state = reactive({
             historyList: [],
             spreadList: false,
             hotSearchList: [],
             deleteHistoryModalVisible: false,
+            isLoading: false,
         });
-        if (localStorage[searchHistoryKey]) state.historyList = JSON.parse(localStorage[searchHistoryKey]);
+        const getHistory = () => {
+            state.historyList = localStorage[searchHistoryKey] ? JSON.parse(localStorage[searchHistoryKey]) : [];
+        };
+        watch(
+            () => props.modelValue,
+            newV => {
+                getHistory();
+            },
+            {
+                immediate: true,
+            }
+        );
         const removeHistoryItem = (item, index) => {
             state.historyList.splice(index, 1);
             localStorage[searchHistoryKey] = JSON.stringify(state.historyList);
         };
         const getSearchHotDetail = () => {
+            state.isLoading = true;
             getSearchHotDetailApi().then((res: AxiosResponseProps) => {
+                state.isLoading = false;
                 if (res.code === 200) {
                     state.hotSearchList = res.data;
                 }
@@ -77,12 +111,17 @@ export default defineComponent({
         const confirmDeleteHistory = () => {
             state.deleteHistoryModalVisible = false;
             localStorage[searchHistoryKey] = "";
+            getHistory();
+        };
+        const toSearchResultDetail = () => {
+            router.push({ path: "/searchResultDetail", query: { keyword: props.keyword as string } });
         };
         return {
             ...toRefs(state),
             removeHistoryItem,
             deleteHistory,
             confirmDeleteHistory,
+            toSearchResultDetail,
         };
     },
 });
@@ -96,6 +135,15 @@ export default defineComponent({
     overflow-y: scroll;
     z-index: 10;
     @extend .hideScrollBar;
+    animation: startAni 0.3s;
+    @keyframes startAni {
+        from {
+            height: 420px;
+        }
+        to {
+            height: 450px;
+        }
+    }
     .title {
         height: 25px;
         .deleteIcon {
@@ -103,15 +151,14 @@ export default defineComponent({
         }
     }
     .historyList {
-        height: 70px;
+        min-height: 70px;
         max-height: 70px;
         overflow: hidden;
-        transition: max-height 1s;
+        transition: max-height 0.4s;
     }
     .spreadList {
-        height: auto;
         max-height: 160px;
-        transition: max-height 1s;
+        transition: max-height 0.4s;
     }
     .historyItem {
         .closeIcon {
@@ -137,7 +184,7 @@ export default defineComponent({
         .hotIcon {
             height: 12px;
         }
-        &:hover{
+        &:hover {
             background-color: rgba($color: #000000, $alpha: 0.07);
         }
     }

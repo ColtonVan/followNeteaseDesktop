@@ -132,7 +132,6 @@ export default defineComponent({
         const pauseMusic = () => {
             nextTick(() => {
                 state.audioTag.pause();
-                store.commit("changeIsMusicPlaying", false);
             });
         };
         const changeMtProgress = progress => {
@@ -200,9 +199,14 @@ export default defineComponent({
             state.audioTag.onplay = () => {
                 store.commit("changeIsMusicPlaying", true);
             };
+            //暂停播放时触发
+            state.audioTag.onpause = () => {
+                store.commit("changeIsMusicPlaying", false);
+            };
             //播放出错时触发
             state.audioTag.onerror = (err: Error) => {
-                state.toastRef.warn("播放失败，请稍后重试");
+                console.dir(err);
+                // state.toastRef.warn("播放失败，请稍后重试");
             };
             //当前歌曲播放完毕时触发
             state.audioTag.onended = () => {
