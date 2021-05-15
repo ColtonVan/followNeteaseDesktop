@@ -18,6 +18,7 @@ export default defineComponent({
 .routerContainer {
     height: calc(100vh - 75px - 60px);
     width: calc(100vw - 200px);
+    min-width: 600px;
     overflow-x: hidden;
     .playList-enter-active,.playList-leave-active {
         transition: right 0.3s ease;

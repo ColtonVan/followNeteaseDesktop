@@ -29,5 +29,6 @@ export default {
 <style lang="scss">
 .main {
     position: relative;
+    overflow: hidden;
 }
 </style>

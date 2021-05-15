@@ -1,5 +1,5 @@
 <template>
-    <div @mouseenter="stopSwiper" @mouseleave="continueSwiper" class="bannerList position-relative mt-2">
+    <div @mouseenter="stopSwiper" @mouseleave="continueSwiper" class="bannerList position-relative mt-2 rounded-7 overflow-hidden">
         <div
             class="changeBannerIcon cursor-pointer position-absolute top-50 translate-middle-y rounded-circle d-flex justify-content-center align-items-center"
             @click="changeBanner('pre')"
@@ -55,38 +55,38 @@
         <ThinArrowRightIcon width="18" height="18" style="filter: blur()" />
     </div>
 
-    <div class="recommendList px-1 py-2 d-flex flex-wrap justify-content-between">
-        <div @click="$router.push('/dailyRec')" class="recommentItem mb-3 dailyBox">
-            <div class="recommendItemImg position-relative rounded-4 cursor-pointer overflow-hidden">
+    <div class="recommendList px-1 py-2 d-flex justify-content-between flex-wrap">
+        <div @click="$router.push('/dailyRec')" class="recommentItem mb-4 position-relative dailyBox">
+            <div class="recommendItemImg start-0 top-0 position-absolute rounded-4 cursor-pointer overflow-hidden">
                 <div class="position-absolute fs-5 w-100 dailyTips text-white p-2">
                     根据您的音乐口味生成每日更新
                 </div>
-                <div class="position-absolute translate-middle top-50 start-50">
-                    <div class="nowDay position-absolute start-50 translate-middle fs-1 text-white">
+                <div class="position-absolute translate-middle w-50 h-50 top-50 start-50">
+                    <div class="nowDay position-absolute start-50 translate-middle text-white">
                         {{ String(nowDay).padStart(2, "0") }}
                     </div>
-                    <CalendarIcon width="108" height="108" />
+                    <CalendarIcon width="100%" height="100%" />
                 </div>
                 <div class="position-absolute rounded-circle hover-play justify-content-center align-items-center">
                     <div class="trigonalPlay"></div>
                 </div>
             </div>
-            <div class="recTitle w-100 mt-2 fs-5 text-muted">每日歌曲推荐</div>
+            <div class="recTitle position-absolute start-0 bottom-0 w-100 fs-5 text-muted">每日歌曲推荐</div>
         </div>
-        <div class="recommentItem mb-3" v-for="(rec, recIndex) in personalizedList" :key="recIndex">
+        <div class="recommentItem mb-4 position-relative" v-for="(rec, recIndex) in personalizedList" :key="recIndex">
             <div
-                class="recommendItemImg position-relative rounded-4 cursor-pointer overflow-hidden position-relative"
+                class="recommendItemImg start-0 top-0 position-absolute rounded-4 cursor-pointer overflow-hidden position-relative"
                 :style="{ backgroundImage: `url('${rec.picUrl}')` }"
             >
                 <div class="playCountLine position-absolute d-flex align-items-center">
                     <HollowPlayIcon width="12" height="12" />
-                    <span class="text-white ms-1">{{ playCount(rec.playCount) }}</span>
+                    <span class="text-white ms-1 flex-shrink-0">{{ playCount(rec.playCount) }}</span>
                 </div>
                 <div class="position-absolute rounded-circle hover-play justify-content-center align-items-center">
                     <div class="trigonalPlay"></div>
                 </div>
             </div>
-            <div class="recTitle w-100 mt-2 fs-5 text-muted">{{ rec.name }}</div>
+            <div class="recTitle position-absolute start-0 bottom-0 w-100 fs-5 text-muted">{{ rec.name }}</div>
         </div>
     </div>
 </template>
@@ -131,7 +131,7 @@ export default defineComponent({
         const getPersonalized = () => {
             getPersonalizedApi({ limit: 9 }).then((res: any) => {
                 if (res.code === 200) {
-                    state.personalizedList = res.result;
+                    state.personalizedList = res.result.slice(0, 9);
                 }
             });
         };
@@ -190,11 +190,11 @@ export default defineComponent({
 <style lang="scss" scoped>
 .bannerList {
     width: 100%;
-    $bannerListHeight: calc(400 * 0.07vw * 0.5);
+    $bannerListHeight: calc(400 * 1px * 0.5);
     height: $bannerListHeight;
     .bannerItem {
-        $width: calc(1080 * 0.07vw * 0.3);
-        $height: calc(400 * 0.07vw * 0.3);
+        $width: calc(1080 * 1px * 0.3);
+        $height: calc(400 * 1px * 0.3);
         left: calc(50% - #{$width}/ 2);
         top: calc(50% - #{$height} / 2);
         width: $width;
@@ -205,8 +205,8 @@ export default defineComponent({
         z-index: 1;
     }
     .firstBanner {
-        $width: calc(1080 * 0.07vw * 0.5);
-        $height: calc(400 * 0.07vw * 0.5);
+        $width: calc(1080 * 1px * 0.5);
+        $height: calc(400 * 1px * 0.5);
         left: calc(50% - #{$width}/ 2);
         top: calc(50% - #{$height} / 2);
         width: $width;
@@ -215,8 +215,8 @@ export default defineComponent({
         z-index: 3;
     }
     .secondBanner {
-        $width: calc(1080 * 0.07vw * 0.4);
-        $height: calc(400 * 0.07vw * 0.4);
+        $width: calc(1080 * 1px * 0.4);
+        $height: calc(400 * 1px * 0.4);
         left: calc(100% - #{$width});
         top: calc(#{$bannerListHeight}/ 2 - #{$height}/ 2);
         width: $width;
@@ -225,10 +225,10 @@ export default defineComponent({
         z-index: 2;
     }
     .lastBanner {
-        $height: calc(400 * 0.07vw * 0.4);
+        $height: calc(400 * 1px * 0.4);
         left: 0;
         top: calc(#{$bannerListHeight}/ 2 - #{$height}/ 2);
-        width: calc(1080 * 0.07vw * 0.4);
+        width: calc(1080 * 1px * 0.4);
         height: $height;
         transition: all ease 0.6s;
         z-index: 2;
@@ -254,10 +254,12 @@ export default defineComponent({
 }
 .recommendList {
     .recommentItem {
-        width: 186px;
+        padding-left: 18%;
+        padding-top: calc(18% + 4.5rem);
+        // margin-right: 2%;
         .recommendItemImg {
-            width: 186px;
-            height: 186px;
+            padding-left: 100%;
+            padding-top: 100%;
             background-color: #ccc;
             background-size: cover;
             background-repeat: no-repeat;
@@ -284,6 +286,8 @@ export default defineComponent({
                 }
             }
             &:after {
+                left: 0;
+                top: 0;
                 content: "";
                 width: 100%;
                 height: 100%;
@@ -308,7 +312,11 @@ export default defineComponent({
             }
         }
         .recTitle {
-            min-height: 50px;
+            // min-height: 50px;
+            // height: 5%;
+            @include ellipsis(2);
+            min-height: 4rem;
+            bottom: 0;
         }
     }
     .dailyBox {
@@ -321,11 +329,13 @@ export default defineComponent({
         .recommendItemImg {
             background-color: transparent;
             .dailyTips {
+                left: 0;
                 top: -58px;
-                height: 58px;
+                height: 4.5rem;
                 box-sizing: border-box;
                 background-color: rgba($color: #000000, $alpha: 0.4);
                 transition: top ease 0.4s;
+                @include ellipsis(2);
             }
             &:hover {
                 .dailyTips {
@@ -334,6 +344,8 @@ export default defineComponent({
                 }
             }
             &::before {
+                top: 0;
+                left: 0;
                 z-index: -2;
                 content: "";
                 position: absolute;
@@ -344,6 +356,8 @@ export default defineComponent({
                 filter: blur(10px);
             }
             &::after {
+                top: 0;
+                left: 0;
                 z-index: -1;
                 content: "";
                 position: absolute;
@@ -355,6 +369,7 @@ export default defineComponent({
         }
         .nowDay {
             top: 60%;
+            font-size: 2.8vw;
         }
     }
 }

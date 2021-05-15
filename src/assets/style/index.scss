@@ -116,3 +116,12 @@ $utilities: (
         ),
     ),
 );
+@mixin ellipsis($rows) {
+    text-overflow: -o-ellipsis-lastline;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: #{$rows};
+    line-clamp: #{$rows};
+    -webkit-box-orient: vertical;
+}
