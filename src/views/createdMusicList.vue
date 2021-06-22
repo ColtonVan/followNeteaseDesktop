@@ -1,10 +1,10 @@
 <template>
     <div class="pb-5 d-flex">
         <img :src="playListDetail.coverImgUrl" width="190" class="rounded-5 me-5" alt="" />
-        <div>
+        <div class="flex-grow-1">
             <div class="d-flex align-items-center">
                 <div class="MusicListTag rounded flex-center me-2">歌单</div>
-                <div class="fs-3 fw-bold canSelect">{{ playListDetail.name }}</div>
+                <div class="fs-3 fw-bold canSelect text-ellipsis flex-grow-1" style="width: 0;">{{ playListDetail.name }}</div>
             </div>
             <div class="d-flex align-items-center mt-3">
                 <img width="35" class="rounded-pill me-3 cursor-pointer" :src="playListDetail.creator?.avatarUrl" alt="" />

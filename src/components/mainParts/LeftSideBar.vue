@@ -149,11 +149,11 @@ export default defineComponent({
                 title: "发现音乐",
                 key: "fxyy",
                 active: true,
-                path: "/discoverMusic",
+                path: "/container/discoverMusic",
             },
             {
                 title: "视频",
-                path: "/videos",
+                path: "/container/videos",
                 key: "sp",
             },
             {
@@ -167,12 +167,7 @@ export default defineComponent({
             {
                 title: "私人FM",
                 key: "srfm",
-            },
-            // {
-            //     title: "我喜欢的音乐",
-            //     key: "wxhdyy",
-            //     id: 0,
-            // },
+            }
         ];
         const state = reactive({
             createdCollapsed: false,
@@ -202,7 +197,7 @@ export default defineComponent({
         );
         const clickMenuItem = menuItem => {
             if (menuItem.id !== undefined) {
-                return router.push({ path: "/createdMusicList", query: { id: menuItem.id } });
+                return router.push({ path: "/container/createdMusicList", query: { id: menuItem.id } });
             }
             if (menuItem.path) {
                 router.push(menuItem.path);

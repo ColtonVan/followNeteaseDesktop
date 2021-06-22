@@ -13,6 +13,11 @@ a {
     color: #0c73c2;
     text-decoration: none;
 }
+.bg-base {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
 .canSelect {
     -webkit-touch-callout: text; /* iOS Safari */
     -webkit-user-select: text; /* Chrome/Safari/Opera */
@@ -57,12 +62,20 @@ a {
 .filter-invert-1 {
     filter: invert(1);
 }
+.layoutWidth {
+    width: 940px;
+}
 @for $index from -10 to 10 {
     .translate-x-#{$index * 10} {
         transform: translateX(#{$index * 10%});
     }
     .translate-y-#{$index * 10} {
         transform: translateY(#{$index * 10%});
+    }
+}
+@for $index from -20 to 20 {
+    .rotate-#{$index * 5} {
+        transform: rotate(#{$index * 5}deg);
     }
 }
 // 鼠标样式

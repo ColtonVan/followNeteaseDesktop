@@ -1,5 +1,5 @@
 <template>
-    <div @click.stop="" class="playList position-fixed bordered bg-white">
+    <div @click.stop class="playList position-fixed bordered bg-white">
         <div
             :style="{ opacity: currentPlayList && currentPlayList.length ? 1 : 0.6 }"
             class="d-flex align-items-center mt-5 mx-4 justify-content-between border-bottom pb-3"
@@ -49,11 +49,12 @@
                 >
             </div>
         </div>
-        <CommonModal v-model:visible="commonModalVisible">
-            <div class="text-center">由于版权保护，您所在的地区暂时无法使用。</div>
-        </CommonModal>
+
         <CollectionListModal :tracks="currentPlayList.map(item => item.id).reverse()" v-model:visible="colVisible" />
     </div>
+    <CommonModal @confirm="confirmCopyModal" v-model:visible="commonModalVisible">
+        <div class="text-center">由于版权保护，您所在的地区暂时无法使用。</div>
+    </CommonModal>
 </template>
 
 <script lang="ts">
@@ -93,9 +94,14 @@ export default defineComponent({
             column.clickTime = Date.now();
             clickedColumns.push(column);
         };
+        const confirmCopyModal = (six) => {
+            console.log("confirm");
+            state.commonModalVisible = false;
+        };
         return {
             ...toRefs(state),
             playTime,
+            confirmCopyModal,
             clickMusicItem,
         };
     },

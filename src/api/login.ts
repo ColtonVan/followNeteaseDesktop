@@ -47,3 +47,12 @@ export const getUserPlayList = () => {
         }
     });
 };
+export const getUserFollowsApi = (params: { limit: number; offset: number } = { limit: 10, offset: 0 }) => {
+    return getAccountInfo().then(async (res: any) => {
+        if (res.code === 200 && res.account && res.account.id) {
+            return await axiosInstance.get("/user/follows", { params: { ...params, uid: res.account.id, timeStamp: Date.now() } });
+        } else {
+            return { code: 200 };
+        }
+    });
+};

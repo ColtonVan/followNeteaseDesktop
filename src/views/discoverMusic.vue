@@ -21,7 +21,7 @@ export default defineComponent({
                 {
                     title: "个性推荐",
                     active: true,
-                    path: "/discoverMusic/personalizedRec",
+                    path: "/container/discoverMusic/personalizedRec",
                 },
                 {
                     title: "歌单",

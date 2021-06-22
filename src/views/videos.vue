@@ -11,16 +11,21 @@
             </div>
             <VideoGroupPanel @confirm="confirmGroup" @click.stop v-model:groupId="groupId" v-model:visible="groupVisible" />
             <div class="videoCats d-flex align-items-center justify-content-end text-ellipsis">
-                <span @click="groupId = item.id" v-for="item in categoryList" :key="item.id" class="videoCat hover-opacity text-secondary">{{
-                    item.name
-                }}</span>
+                <span
+                    @click="groupId = item.id"
+                    :class="{ selected: item.id === groupId }"
+                    v-for="item in categoryList"
+                    :key="item.id"
+                    class="videoCat rounded-pill px-3 py-1 hover-opacity text-secondary"
+                    >{{ item.name }}</span
+                >
             </div>
         </div>
         <div class="flex-grow-1">
             <div class="container h-100">
                 <div class="h-100 row d-flex flex-column align-items-center">
                     <div class="h-100 col-xxl-10 containerCol">
-                        <VideoList style="height: calc(100vh - 75px - 60px - 38px - 40px - 3.3rem);" class="pt-5" v-model:id="groupId" />
+                        <VideoList style="max-height: calc(100vh - 75px - 60px - 38px - 40px - 3.3rem);" class="pt-5" v-model:id="groupId" />
                     </div>
                 </div>
             </div>
@@ -87,8 +92,41 @@ export default defineComponent({
     .videoCats {
         width: 80%;
         .videoCat + .videoCat {
-            margin-left: 20px;
+            margin-left: 7px;
         }
+    }
+}
+.primaryTheme {
+    .videoCat {
+        &:hover {
+            color: $primary !important;
+        }
+    }
+    .selected {
+        color: $primary !important;
+        background-color: rgba($color: $primary, $alpha: 0.1);
+    }
+}
+.darkTheme {
+    .videoCat {
+        &:hover {
+            color: $dark !important;
+        }
+    }
+    .selected {
+        color: $dark !important;
+        background-color: rgba($color: $dark, $alpha: 0.1);
+    }
+}
+.freeTheme {
+    .videoCat {
+        &:hover {
+            color: $free !important;
+        }
+    }
+    .selected {
+        color: $free !important;
+        background-color: rgba($color: $free, $alpha: 0.1);
     }
 }
 </style>

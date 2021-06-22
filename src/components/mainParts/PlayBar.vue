@@ -1,19 +1,43 @@
 <template>
-    <div class="playBar border-top position-absolute bottom-0 vw-100 d-flex align-items-center justify-content-between">
+    <div class="playBar bg-white border-top position-absolute bottom-0 vw-100 d-flex align-items-center justify-content-between overflow-hidden">
         <audio class="d-none" ref="audioTag" :muted="musicMuted" controls :src="currentMusicUrl"></audio>
-        <div class="leftMusicInfo ps-3 d-flex align-items-center cursor-pointer">
-            <div class="musicCoverBox rounded-4 overflow-hidden position-relative flex-shrink-0">
-                <img :src="currentMusicDetail.al.picUrl" width="55" alt="" />
-            </div>
-            <div class="ms-3 fs-5">
-                <div class="d-flex align-items-center">
-                    <span class="musicName text-ellipsis" :title="currentMusicDetail.name">{{ currentMusicDetail.name }}</span>
-                    <LikedIcon v-if="loginStatus" class="ms-2 cursor-pointer" width="16" height="16" />
+        <div class="leftMusicInfo h-100 ps-3 translate-y--10">
+            <div class="d-flex h-100 align-items-center cursor-pointer">
+                <div class="musicCoverBox rounded-4 overflow-hidden position-relative flex-shrink-0" title="展开音乐详情页">
+                    <img :src="currentMusicDetail.al.picUrl" width="55" height="55" alt="" />
+                    <div class="spreadMusicDetail w-100 h-100 position-absolute top-0 start-0 flex-center">
+                        <arrow-left-icon class="rotate-90" width="20px" height="20px" />
+                    </div>
                 </div>
-                <div class="mt-1">
-                    <span class="musicAr text-ellipsis" :title="currentMusicDetail.ar.map(item => item.name).join('、')">{{
-                        currentMusicDetail.ar.map(item => item.name).join("、")
-                    }}</span>
+                <div class="ms-3 fs-5">
+                    <div class="d-flex align-items-center">
+                        <span class="musicName text-ellipsis" :title="currentMusicDetail.name">{{ currentMusicDetail.name }}</span>
+                        <LikedIcon v-if="loginStatus" class="ms-2 cursor-pointer" width="16" height="16" />
+                    </div>
+                    <div class="mt-1">
+                        <span class="musicAr text-ellipsis" :title="currentMusicDetail.ar.map(item => item.name).join('、')">{{
+                            currentMusicDetail.ar.map(item => item.name).join("、")
+                        }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex h-100 align-items-center cursor-pointer">
+                <div class="musicCoverBox rounded-4 overflow-hidden position-relative flex-shrink-0" title="展开音乐详情页">
+                    <img :src="currentMusicDetail.al.picUrl" width="55" height="55" alt="" />
+                    <div class="spreadMusicDetail w-100 h-100 position-absolute top-0 start-0 flex-center">
+                        <arrow-left-icon class="rotate-90" width="20px" height="20px" />
+                    </div>
+                </div>
+                <div class="ms-3 fs-5">
+                    <div class="d-flex align-items-center">
+                        <span class="musicName text-ellipsis" :title="currentMusicDetail.name">{{ currentMusicDetail.name }}</span>
+                        <LikedIcon v-if="loginStatus" class="ms-2 cursor-pointer" width="16" height="16" />
+                    </div>
+                    <div class="mt-1">
+                        <span class="musicAr text-ellipsis" :title="currentMusicDetail.ar.map(item => item.name).join('、')">{{
+                            currentMusicDetail.ar.map(item => item.name).join("、")
+                        }}</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -28,9 +52,13 @@
                         height="22"
                     />
                 </div>
-                <div class="rounded-pill playIconBox flex-center ms-4" :title="isPlaying ? '暂停' : '播放'">
-                    <PauseIcon @click="pauseMusic" v-if="isPlaying" width="20" height="20" />
-                    <DownArrowIcon @click="playMusic" v-else width="22" height="22" class="filter-invert-1 playIcon" />
+                <div
+                    @click="isPlaying ? pauseMusic() : playMusic()"
+                    class="rounded-pill playIconBox flex-center ms-4"
+                    :title="isPlaying ? '暂停' : '播放'"
+                >
+                    <PauseIcon v-if="isPlaying" width="20" height="20" />
+                    <DownArrowIcon v-else width="22" height="22" class="filter-invert-1 playIcon" />
                 </div>
                 <div @click="changeMusic('next')" title="下一首">
                     <NextMusicIcon
@@ -234,6 +262,18 @@ export default defineComponent({
         .musicCoverBox {
             width: 55px;
             height: 55px;
+            > img {
+                object-fit: cover;
+            }
+            .spreadMusicDetail {
+                display: none;
+            }
+            &:hover {
+                .spreadMusicDetail {
+                    display: flex;
+                    background-color: rgba($color: #000, $alpha: 0.7);
+                }
+            }
         }
         .musicName {
             max-width: 240px;

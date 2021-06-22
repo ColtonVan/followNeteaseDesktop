@@ -55,7 +55,7 @@ export default defineComponent({
                 timer2 = setTimeout(() => {
                     state.startCloseAni = false;
                     state.visible = false;
-                }, 600);
+                }, 800);
             }, state.duration);
         };
         return {
@@ -76,7 +76,7 @@ export default defineComponent({
 }
 .closeToast {
     opacity: 1;
-    animation: opacityAni 0.6s;
+    animation: opacityAni 0.8s;
 }
 @keyframes opacityAni {
     from {

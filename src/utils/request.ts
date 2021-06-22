@@ -4,13 +4,15 @@ export interface AxiosResponseProps {
     code?: number;
     status?: number;
     data?: any;
+    datas?: any;
+    msg?: string | null;
 }
 const axiosIns: AxiosInstance = axios.create({
     baseURL: process.env.VUE_APP_baseURL,
     withCredentials: true,
 } as AxiosRequestConfig);
 axiosIns.interceptors.request.use((config: AxiosRequestConfig) => {
-    let ignoreLoadingUrls = ["/login/qr/check", "/search/hot/detail","/search/suggest"];
+    let ignoreLoadingUrls = ["/login/qr/check", "/search/hot/detail", "/search/suggest"];
     if (!ignoreLoadingUrls.includes(config.url)) {
         store.commit("changeIsLoading", true);
     }

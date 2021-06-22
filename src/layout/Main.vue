@@ -1,11 +1,7 @@
 <template>
     <div class="main vw-100 vh-100 position-relative" :class="{ [theme]: allowTheme }">
         <Nav />
-        <div class="d-flex">
-            <LeftSideBar />
-            <Container />
-        </div>
-        <PlayBar />
+        <router-view></router-view>
         <RequestLoading />
     </div>
 </template>

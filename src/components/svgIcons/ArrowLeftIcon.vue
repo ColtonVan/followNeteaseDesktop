@@ -12,9 +12,21 @@
     <path
       d="M210.4 511.1 641.3 80.2c22.8-22.8 59.8-22.8 82.6 0 22.8 22.8 22.8 59.8 0 82.6L375.7 511.1l348.3 348.3c22.8 22.8 22.8 59.8 0 82.6-22.8 22.8-59.8 22.8-82.6 0L210.4 511.1 210.4 511.1zM210.4 511.1"
       p-id="9295"
-      fill="#ffffff"
+      :fill="color"
       data-spm-anchor-id="a313x.7781069.0.i8"
       class="selected"
     ></path>
   </svg>
 </template>
+<script lang="ts">
+import { defineComponent } from "vue";
+export default defineComponent({
+    props: {
+        color: {
+            type: String,
+            default: "#fff",
+        },
+    },
+    setup() {},
+});
+</script>
