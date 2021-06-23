@@ -49,7 +49,6 @@
                 >
             </div>
         </div>
-
         <CollectionListModal :tracks="currentPlayList.map(item => item.id).reverse()" v-model:visible="colVisible" />
     </div>
     <CommonModal @confirm="confirmCopyModal" v-model:visible="commonModalVisible">
@@ -95,7 +94,6 @@ export default defineComponent({
             clickedColumns.push(column);
         };
         const confirmCopyModal = (six) => {
-            console.log("confirm");
             state.commonModalVisible = false;
         };
         return {
@@ -116,7 +114,7 @@ export default defineComponent({
     right: 0;
     box-shadow: 0 -0.5rem 1rem rgba(0, 0, 0, 0.15);
     border-top-left-radius: 0.5rem;
-    z-index: 996;
+    z-index: 995;
     .rightBtns {
         font-size: 1.15rem;
     }

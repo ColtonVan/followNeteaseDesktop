@@ -1,10 +1,20 @@
 <template>
-    <div @click.self="clickNav" id="nav" class="nav d-flex w-100 flex-shrink-0 flex-nowrap justify-content-between align-items-center">
-        <div class="leftArea d-flex align-items-center">
-            <div class="logo ms-4 cursor-pointer me-5"></div>
+    <div
+        @click.self="clickNav"
+        id="nav"
+        :class="{ mainNav: type === '' }"
+        class="nav d-flex w-100 flex-shrink-0 flex-nowrap justify-content-between align-items-center"
+    >
+        <div class="leftArea d-flex align-items-center h-100">
+            <div v-if="type === ''" class="logo ms-4 cursor-pointer me-5"></div>
+            <div v-else class="dropDownOuter h-100 pe-4 me-5">
+                <div class="dropDown flex-center cursor-pointer ms-2" @click="$emit('ondrop')">
+                    <arrow-left-icon class="rotate--90" color="#333" width="20px" height="20px" />
+                </div>
+            </div>
             <div class="d-flex flex-center ms-5 me-5">
                 <div
-                    @click="routeBack"
+                    @click="type === '' ? routeBack() : $emit('ondrop')"
                     class="rounded-circle routerBackIcon me-3 flex-center"
                     :class="{ cantBack: $store.state.routeFromList.length <= 1 }"
                     title="向前返回"
@@ -12,7 +22,7 @@
                     <ArrowLeftIcon title="向前返回" width="11" height="11" />
                 </div>
                 <div
-                    @click="$router.forward()"
+                    @click="type === '' ? $router.forward() : $emit('ondrop')"
                     class="rounded-circle routerBackIcon flex-center"
                     :class="{ cantBack: !hasReturned }"
                     title="向后返回"
@@ -32,7 +42,11 @@
                     class="searchInput rounded-pill text-white ms-1"
                     type="text"
                 />
-                <SearchHistoryPanel v-model="searchHistoryVisible" v-model:keyword="searchKeyword" v-if="searchHistoryVisible && !searchKeyword.length" />
+                <SearchHistoryPanel
+                    v-model="searchHistoryVisible"
+                    v-model:keyword="searchKeyword"
+                    v-if="searchHistoryVisible && !searchKeyword.length"
+                />
                 <SearchResultList
                     v-model="searchHistoryVisible"
                     v-if="searchHistoryVisible && searchKeyword.length"
@@ -42,24 +56,27 @@
             </div>
         </div>
         <div class="rightArea d-flex align-items-center mx-3">
-            <span v-if="userInfo && userInfo.nickname" @click.stop="userInfoModalVisible = !userInfoModalVisible" class="position-relative">
-                <img :src="userInfo.avatarUrl" class="rounded-circle cursor-pointer" width="28" alt="" />
-                <span class="hover-opacity text-white ms-3 fs-6 cursor-pointer">{{ userInfo.nickname }}</span>
-                <DownArrowIcon class="ms-2 hover-opacity cursor-pointer" width="12" height="12" />
-                <UserInfoModal v-model:visible="userInfoModalVisible" />
+            <span v-if="type === ''">
+                <span v-if="userInfo && userInfo.nickname" @click.stop="userInfoModalVisible = !userInfoModalVisible" class="position-relative">
+                    <img :src="userInfo.avatarUrl" class="rounded-circle cursor-pointer" width="28" alt="" />
+                    <span class="hover-opacity text-white ms-3 fs-6 cursor-pointer">{{ userInfo.nickname }}</span>
+                    <DownArrowIcon class="ms-2 hover-opacity cursor-pointer" width="12" height="12" />
+                    <UserInfoModal v-model:visible="userInfoModalVisible" />
+                </span>
+                <span v-else @click="loginModalVisible = !loginModalVisible" class="cursor-pointer hover-opacity position-relative">
+                    <NotLoginIcon width="28" height="28" />
+                    <span class="text-white ms-3 fs-6">未登录</span>
+                    <DownArrowIcon class="ms-2" width="12" height="12" />
+                </span>
             </span>
-            <span v-else @click="loginModalVisible = !loginModalVisible" class="cursor-pointer hover-opacity position-relative">
-                <NotLoginIcon width="28" height="28" />
-                <span class="text-white ms-3 fs-6">未登录</span>
-                <DownArrowIcon class="ms-2" width="12" height="12" />
-            </span>
-            <span class="position-relative">
+
+            <span v-if="type === ''" class="position-relative">
                 <SkinIcon class="ms-5" width="18" height="18" @click.stop="themePanelVisible = !themePanelVisible" />
                 <ThemePanel @click.stop v-if="themePanelVisible" />
             </span>
             <EmailIcon class="ms-4" width="18" height="18" />
             <div class="border-end ms-4 opacity-50" style="height:16px;"></div>
-            <ToHomeIcon @click="$router.push('/')" width="19" height="19" />
+            <ToHomeIcon @click="type === '' ? $router.push('/') : $emit('ondrop')" width="19" height="19" />
             <FullScreenIsTrueIcon v-if="isFullScreen" @click="toggleFullScreen" width="18" height="18" />
             <FullScreenIsFalseIcon v-else @click="toggleFullScreen" width="18" height="18" />
             <CloseIcon @click="handleCloseWindow" width="16" height="16" />
@@ -86,8 +103,12 @@ import useFullScrenn from "@/hooks/useFullScreen";
 import useClickDocument, { useClickDom, useClickOnce } from "@/hooks/useClickDocument";
 import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
+import ArrowLeftIcon from "../svgIcons/ArrowLeftIcon.vue";
 const searchHistoryKey = "searchHistory";
 export default defineComponent({
+    props: {
+        type: { type: String, default: "" },
+    },
     setup() {
         const store = useStore();
         const router = useRouter();
@@ -194,6 +215,14 @@ export default defineComponent({
             height: 45px;
             transform: scale(0.88);
         }
+        .dropDownOuter {
+            width: 170px;
+            height: 45px;
+            .dropDown {
+                width: 60px;
+                height: 60px;
+            }
+        }
         .routerBackIcon {
             width: 25px;
             height: 25px;
@@ -249,17 +278,17 @@ export default defineComponent({
     }
 }
 .primaryTheme {
-    .nav {
+    .mainNav {
         background-color: $primary;
     }
 }
 .darkTheme {
-    .nav {
+    .mainNav {
         background-color: $dark;
     }
 }
 .freeTheme {
-    .nav {
+    .mainNav {
         background-color: $free;
     }
 }

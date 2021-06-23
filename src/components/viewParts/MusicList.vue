@@ -29,14 +29,13 @@
             </div>
         </div>
     </div>
-    <CommonModal v-model:visible="commonModalVisible">
+    <CommonModal v-model:visible="commonModalVisible" @confirm="commonModalVisible = false">
         <div class="text-center">由于版权保护，您所在的地区暂时无法使用。</div>
     </CommonModal>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType, reactive, toRefs, watch } from "vue";
-import { getSongUrlApi } from "@/api/song";
+import { computed, defineComponent, PropType, reactive, toRefs } from "vue";
 import { useStore } from "vuex";
 export default defineComponent({
     props: {
