@@ -131,16 +131,7 @@
                 />
             </div>
         </div>
-        <div :class="{ showLyricPanel }" class="lyricPanel position-absolute">
-            <Nav type="lyricPanel" @ondrop="showLyricPanel = false" />
-            <div class="lyricContainer">
-                <div class="diskOuter w-100 d-flex align-items-center">
-                    <div class="diskBox rounded-circle">
-                        <div class="diskBg"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <LyricPanel v-model:visible="showLyricPanel" v-model:currentTime="musicCurrentTime" />
     </div>
     <CommonToast ref="toastRef" />
     <CollectionListModal :tracks="[currentMusicDetail.id]" v-model:visible="colVisible" />
@@ -325,31 +316,6 @@ export default defineComponent({
 <style scoped lang="scss">
 .playBarOuter {
     $playBarHeight: 75px;
-    .lyricPanel {
-        z-index: 900;
-        top: $playBarHeight;
-        width: 100vw;
-        height: calc(100vh - #{$playBarHeight});
-        background: linear-gradient(to bottom, rgb(218, 204, 204), #fff);
-        transition: top ease 0.4s;
-        .lyricContainer {
-            height: calc(100% - 75px);
-            width: 100%;
-            .diskOuter {
-                $diskOuterWidth: 260px;
-                width: $diskOuterWidth;
-                .diskBox {
-                    width: $diskOuterWidth;
-                    height: $diskOuterWidth;
-                    background-color: rgba($color: #c5c5c5, $alpha: 0.8);
-                }
-            }
-        }
-    }
-    .showLyricPanel {
-        transition: top ease 0.4s;
-        top: calc(0px - (100vh - #{$playBarHeight}));
-    }
     .playBar {
         z-index: 901;
         .playBarHeight {

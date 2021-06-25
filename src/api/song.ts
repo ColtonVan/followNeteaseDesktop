@@ -8,3 +8,6 @@ export const checkMusicApi = params => {
 export const getSongDetailApi = (ids: string | number[] | string[]) => {
     return axiosInstance.get("/song/detail", { params: { ids: ids instanceof Array ? ids.toString() : ids,t:Date.now() } });
 };
+export const getSongLyricApi = params => {
+    return axiosInstance.get("/lyric", { params });
+};

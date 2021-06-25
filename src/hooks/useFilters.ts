@@ -48,3 +48,14 @@ export const addHaveUrl = async originalList => {
         }
     });
 };
+export const fromLyricStrToTime = timeStr => {
+    // 00:04.193
+    if (!/^\d{2}\:\d{2}\.\d+$/.test(timeStr)) return 0;
+    let splitPart1 = timeStr.split(":");
+    let splitPart2 = splitPart1[1].split(".");
+    let splitArr = [];
+    splitArr[0] = splitPart1[0];
+    splitArr[1] = splitPart2[0];
+    splitArr[2] = `0.${splitPart2[1]}`;
+    return Number(splitArr[0]) * 60 * 1000 + Number(splitArr[1]) * 1000 + Number(splitArr[2]) * 1000;
+};

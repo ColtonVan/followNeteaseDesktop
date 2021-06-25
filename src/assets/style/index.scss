@@ -18,6 +18,9 @@ a {
     background-repeat: no-repeat;
     background-position: center center;
 }
+.box-border {
+    box-sizing: border-box;
+}
 .canSelect {
     -webkit-touch-callout: text; /* iOS Safari */
     -webkit-user-select: text; /* Chrome/Safari/Opera */
@@ -73,7 +76,7 @@ a {
         transform: translateY(#{$index * 10%});
     }
 }
-@for $index from -20 to 20 {
+@for $index from -36 through 36 {
     .rotate-#{$index * 5} {
         transform: rotate(#{$index * 5}deg);
     }
