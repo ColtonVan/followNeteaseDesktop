@@ -17,7 +17,7 @@
                     :class="{ pausedNeedle: !isPlaying }"
                     :style="{ backgroundImage: `url(${require('@/assets/img/needle-ab.png')})` }"
                 ></div>
-                <div class="diskBox rounded-circle flex-center">
+                <div :class="{ rotateDisk: isPlaying === true }" class="diskBox rounded-circle flex-center">
                     <div class="diskBg rounded-circle flex-center" :style="{ backgroundImage: `url(${require('@/assets/img/coverall.png')})` }">
                         <div :style="{ backgroundImage: `url(${currentMusicDetail.al.picUrl})` }" class="coverBg bg-base rounded-circle"></div>
                     </div>
@@ -27,10 +27,7 @@
                 ref="centerLyric"
                 class="centerLyric d-flex flex-column align-items-center overflow-scroll hideScrollBar text-center canSelect flex-shrink-0"
             >
-                <div
-                    style="transition: transform ease 0.4s;"
-                    :style="{ transform: `translateY(${lyricAreaTranslateY}px)` }"
-                >
+                <div style="transition: transform ease 0.4s;" :style="{ transform: `translateY(${lyricAreaTranslateY}px)` }">
                     <div
                         class="lyricItem flex-shrink-0"
                         :class="{ 'fw-bold': item.active, 'fs-4': item.active }"
@@ -188,7 +185,7 @@ export default defineComponent({
         };
         return {
             ...toRefs(state),
-            clickSimilarMusic
+            clickSimilarMusic,
         };
     },
 });
@@ -243,6 +240,17 @@ $playBarHeight: 75px;
                         background-color: #fff;
                         transform: translate(-0.5%, 0.5%);
                     }
+                }
+            }
+            .rotateDisk {
+                animation: rotateDisk 8s linear infinite;
+            }
+            @keyframes rotateDisk {
+                from {
+                    transform: rotate(0);
+                }
+                to {
+                    transform: rotate(360deg);
                 }
             }
         }
