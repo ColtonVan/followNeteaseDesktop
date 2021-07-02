@@ -22,9 +22,10 @@
 
 <script lang="ts">
 import { useRouter } from "vue-router";
-import { computed, defineComponent, PropType, reactive, toRefs } from "vue";
+import { computed, defineComponent, PropType, reactive, toRefs, ComputedRef } from "vue";
 export interface NavsProps {
-    title: string;
+    title: string | ComputedRef<string>;
+    key?: number;
     active?: boolean;
     path?: string;
 }

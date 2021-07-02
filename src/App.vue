@@ -9,8 +9,12 @@ export default defineComponent({
     components: {
         Main,
     },
-    setup() {},
+    setup() {
+        console.log(process.env.VUE_APP_baseURL);
+    },
 });
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+    
+</style>

@@ -1,4 +1,5 @@
 export const downloadMusic = async (url: string, name: string | number = Date.now()) => {
+    if(!url)return Promise.reject();
     return fetch(url).then(res => {
             if (res.status === 200) {
                 res.blob().then(blob => {

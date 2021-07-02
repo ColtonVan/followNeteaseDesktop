@@ -15,6 +15,7 @@
                     v-for="(item, index) in historyList"
                     :key="index"
                     class="rounded-pill px-3 py-1 mb-3 border text-muted historyItem cursor-pointer flex-center position-relative"
+                    @click="toSearchResultDetail({ searchWord: item.title })"
                 >
                     <span>{{ item.title }}</span>
                     <CloseIcon
@@ -33,7 +34,7 @@
             :class="{ frontHotItem: [0, 1, 2].includes(index) }"
             class="hotItem py-2 d-flex align-items-center cursor-pointer"
             v-for="(item, index) in hotSearchList"
-            @click="toSearchResultDetail"
+            @click="toSearchResultDetail(item)"
             :key="index"
         >
             <div class="flex-center fs-5 fw-bold">{{ index + 1 }}</div>
@@ -60,6 +61,7 @@ import { AxiosResponseProps } from "@/utils/request";
 import { useRouter } from "vue-router";
 const searchHistoryKey = "searchHistory";
 export default defineComponent({
+    emits: ["update:modelValue", "update:keyword", "unshiftKeyword"],
     props: {
         modelValue: {
             type: Boolean,
@@ -70,7 +72,7 @@ export default defineComponent({
             required: true,
         },
     },
-    setup(props) {
+    setup(props, context) {
         const router = useRouter();
         const state = reactive({
             historyList: [],
@@ -113,8 +115,11 @@ export default defineComponent({
             localStorage[searchHistoryKey] = "";
             getHistory();
         };
-        const toSearchResultDetail = () => {
-            router.push({ path: "/searchResultDetail", query: { keyword: props.keyword as string } });
+        const toSearchResultDetail = hotItem => {
+            router.push({ path: "/container/searchResultDetail", query: { keyword: hotItem.searchWord as string } });
+            context.emit("update:keyword", hotItem.searchWord);
+            context.emit("unshiftKeyword", hotItem.searchWord);
+            context.emit("update:modelValue", false);
         };
         return {
             ...toRefs(state),

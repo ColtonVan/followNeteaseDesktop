@@ -66,6 +66,7 @@ export default defineComponent({
         };
         const confirmReplaceList = () => {
             confirmPlayAll();
+            state.commonModalVisible = false;
         };
         const addAll = () => {
             let preMusicList = store.state.currentPlayList;

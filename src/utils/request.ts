@@ -1,5 +1,5 @@
 import store from "@/store/index";
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, Method } from "axios";
 export interface AxiosResponseProps {
     code?: number;
     status?: number;
@@ -7,34 +7,49 @@ export interface AxiosResponseProps {
     datas?: any;
     msg?: string | null;
 }
-const axiosIns: AxiosInstance = axios.create({
-    baseURL: process.env.VUE_APP_baseURL,
-    withCredentials: true,
-} as AxiosRequestConfig);
-axiosIns.interceptors.request.use((config: AxiosRequestConfig) => {
-    let ignoreLoadingUrls = ["/login/qr/check", "/search/hot/detail", "/search/suggest"];
-    if (!ignoreLoadingUrls.includes(config.url)) {
-        store.commit("changeIsLoading", true);
+class HttpRequest {
+    private readonly baseURL: string;
+    private readonly withCredentials: boolean;
+    private readonly timeout: number;
+    constructor() {
+        this.baseURL = process.env.VUE_APP_baseURL;
+        this.withCredentials = true;
+        this.timeout = 1000 * 60;
     }
-    // if (config.method === "get") {
-    //     if (Object.prototype.toString.call(config.params) === "[object Object]") {
-    //         if (!config.params.timeStamp) {
-    //             config.params.timeStamp = Date.now();
-    //         }
-    //     } else {
-    //         config.params = { timeStamp: Date.now() };
-    //     }
-    // }
-    return config;
-});
-axiosIns.interceptors.response.use(
-    (resoponse: AxiosResponse<AxiosResponseProps>) => {
-        store.commit("changeIsLoading", false);
-        return resoponse.data as AxiosResponse<AxiosResponseProps>;
-    },
-    err => {
-        store.commit("changeIsLoading", false);
-        return Promise.reject(err);
+    getInitConfig(): AxiosRequestConfig {
+        return {
+            baseURL: this.baseURL,
+            withCredentials: this.withCredentials,
+            timeout: this.timeout,
+        };
     }
-);
-export default axiosIns;
+    interceptors(instance: AxiosInstance) {
+        instance.interceptors.request.use(
+            config => {
+                let ignoreLoadingUrls = ["/login/qr/check", "/search/hot/detail", "/search/suggest"];
+                if (!ignoreLoadingUrls.includes(config.url)) {
+                    store.commit("changeIsLoading", true);
+                }
+                return config;
+            },
+            error => Promise.reject(error)
+        );
+        instance.interceptors.response.use(
+            response => {
+                store.commit("changeIsLoading", false);
+                return response.data as AxiosResponse<AxiosResponseProps>;
+            },
+            error => {
+                store.commit("changeIsLoading", false);
+                Promise.reject(error);
+            }
+        );
+    }
+    request(): AxiosInstance {
+        const instance = axios.create(this.getInitConfig());
+        this.interceptors(instance);
+        return instance;
+    }
+}
+const http = new HttpRequest();
+export default http.request();

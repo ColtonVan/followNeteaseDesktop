@@ -43,15 +43,17 @@
                     type="text"
                 />
                 <SearchHistoryPanel
+                    @unshiftKeyword="unshiftKeyword"
                     v-model="searchHistoryVisible"
                     v-model:keyword="searchKeyword"
                     v-if="searchHistoryVisible && !searchKeyword.length"
                 />
+                <!-- <pre>{{searchHistoryVisible && searchKeyword.length}}</pre> -->
                 <SearchResultList
                     v-model="searchHistoryVisible"
                     v-if="searchHistoryVisible && searchKeyword.length"
                     :keyword="searchKeyword"
-                    @search="pushKeyword"
+                    @unshiftKeyword="unshiftKeyword(searchKeyword)"
                 />
             </div>
         </div>
@@ -81,20 +83,20 @@
             <FullScreenIsFalseIcon v-else @click="toggleFullScreen" width="18" height="18" />
             <CloseIcon @click="handleCloseWindow" width="16" height="16" />
         </div>
+        <LoginModal v-model:visible="loginModalVisible" />
+        <CommonModal
+            title="关闭提示"
+            v-model:visible="closeModalVisible"
+            bodyClass="text-center"
+            @confirm="
+                window.opener = null;
+                window.open('', '_self');
+                window.close();
+            "
+        >
+            <div class="closeTips" v-html="closeTipsText" />
+        </CommonModal>
     </div>
-    <LoginModal v-model:visible="loginModalVisible" />
-    <CommonModal
-        title="关闭提示"
-        v-model:visible="closeModalVisible"
-        bodyClass="text-center"
-        @confirm="
-            window.opener = null;
-            window.open('', '_self');
-            window.close();
-        "
-    >
-        <div class="closeTips" v-html="closeTipsText" />
-    </CommonModal>
 </template>
 
 <script lang="ts">
@@ -165,8 +167,9 @@ export default defineComponent({
                 toggleFullScreen();
             }
         };
-        const pushKeyword = () => {
-            if (!state.searchKeyword) return;
+        const unshiftKeyword = (searchKeyword: string) => {
+            console.log(searchKeyword);
+            if (!searchKeyword) return;
             let searchHistory = localStorage[searchHistoryKey] ? JSON.parse(localStorage[searchHistoryKey]) : [];
             for (let i = 0; i < searchHistory.length; i++) {
                 if (searchHistory[i].title === state.searchKeyword) {
@@ -179,8 +182,8 @@ export default defineComponent({
         };
         const SearchKeywordKeyup = e => {
             if (e.keyCode === 13) {
-                pushKeyword();
-                router.push({ path: "/searchResultDetail", query: { keyword: state.searchKeyword } });
+                unshiftKeyword(state.searchKeyword);
+                router.push({ path: "/container/searchResultDetail", query: { keyword: state.searchKeyword } });
                 state.searchHistoryVisible = false;
             }
         };
@@ -195,7 +198,7 @@ export default defineComponent({
             clickNav,
             window,
             routeBack,
-            pushKeyword,
+            unshiftKeyword,
             ...toRefs(state),
         };
     },

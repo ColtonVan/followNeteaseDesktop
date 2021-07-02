@@ -1,13 +1,18 @@
 <template>
     <div class="mb-5">
-        <div class="row songRow headRow w-100">
-            <div v-for="(item, index) in columns" :key="index" class="col-3 p-3 text-black-50 fs-5 songCol">
+        <div class="row songRow headRow w-100 ps-5">
+            <div
+                v-for="(item, index) in columns"
+                :key="index"
+                :class="`col-${item.span !== undefined ? item.span : 3}`"
+                class="p-3 text-black-50 fs-5 songCol"
+            >
                 {{ item.title }}
             </div>
         </div>
         <div v-if="!dataSource.length" class="w-100 fs-5 text-muted flex-center py-5 border-bottom">
             <!-- <div>暂无数据，快去收藏音乐吧~</div> -->
-            <div>{{emptyText}}</div>
+            <div>{{ emptyText }}</div>
         </div>
         <div
             v-else
@@ -20,12 +25,15 @@
                 v-for="(column, columnIndex) in columns"
                 :key="columnIndex"
                 @click="clickMusicItem(data)"
-                class="col-3 p-3 songCol"
                 :class="`col-${column.span !== undefined ? column.span : 3}`"
+                class="p-3 songCol"
                 :title="column.render ? column.render(data[column.dataIndex], data) : data[column.dataIndex]"
             >
-                <span v-if="column.render">{{ column.render(data[column.dataIndex], data) }}</span>
-                <span v-else>{{ data[column.dataIndex] }}</span>
+                <slot v-if="column.slots && $slots[column.slots.customRender]" :name="column.slots.customRender" v-bind="data" />
+                <span v-else>
+                    <span v-if="column.render">{{ column.render(data[column.dataIndex], data) }}</span>
+                    <span v-else>{{ data[column.dataIndex] }}</span>
+                </span>
             </div>
         </div>
     </div>
@@ -37,20 +45,27 @@
 <script lang="ts">
 import { computed, defineComponent, PropType, reactive, toRefs } from "vue";
 import { useStore } from "vuex";
+export interface ColumnProps {
+    title: string;
+    dataIndex?: string;
+    render?: (text: any, rowData: object) => string | number;
+    span?: number;
+    slots?: { customRender: string };
+}
 export default defineComponent({
     props: {
         columns: {
-            type: Array as PropType<{ title: string; dataIndex?: string; span?: number; render?: (text: any, recF: any) => any }[]>,
+            type: Array as PropType<ColumnProps[]>,
             default: [],
         },
         dataSource: {
             type: Array as PropType<Partial<{ id: number; name?: string }>[]>,
             default: [],
         },
-        emptyText:{
+        emptyText: {
             type: String,
-            default: "暂无数据，请浏览其他歌单吧~"
-        }
+            default: "暂无数据，请浏览其他歌单吧~",
+        },
     },
     setup(props) {
         const store = useStore();
@@ -59,23 +74,23 @@ export default defineComponent({
             currentPlayList: computed(() => store.state.currentPlayList),
         });
         let clickedColumns = [];
-        const clickMusicItem = column => {
+        const clickMusicItem = rowData => {
             if (
                 clickedColumns.length &&
                 Date.now() - clickedColumns[clickedColumns.length - 1].clickTime < 400 &&
-                column.id === clickedColumns[clickedColumns.length - 1].id
+                rowData.id === clickedColumns[clickedColumns.length - 1].id
             ) {
-                if (column.haveUrl !== false) {
-                    store.commit("changeCurrentMusicDetail", column);
+                if (rowData.haveUrl !== false) {
+                    store.commit("changeCurrentMusicDetail", rowData);
                     store.commit("changeCurrentPlayList", JSON.parse(JSON.stringify(props.dataSource)));
-                    store.dispatch("getCurrentMusicUrlInfo", { id: column.id });
+                    store.dispatch("getCurrentMusicUrlInfo", { id: rowData.id });
                 } else {
                     state.commonModalVisible = true;
                 }
                 return (clickedColumns = []);
             }
-            column.clickTime = Date.now();
-            clickedColumns.push(column);
+            rowData.clickTime = Date.now();
+            clickedColumns.push(rowData);
         };
         return {
             ...toRefs(state),
@@ -88,7 +103,7 @@ export default defineComponent({
 <style scoped lang="scss">
 .headRow {
     .songCol {
-        text-align: center;
+        /* text-align: center; */
     }
 }
 .songRow {

@@ -2,7 +2,14 @@
     <div class="searchResultList rounded-6 shadow position-absolute start-50 translate-middle-x bg-white">
         <LoadingComponent v-if="isLoading" />
         <div v-else>
-            <div class="hover-opacity py-2 px-3 w-100 text-ellipsis">
+            <div
+                @click="
+                    $router.push({ path: '/container/searchResultDetail', query: { keyword } });
+                    $emit('update:modelValue', false);
+                    $emit('unshiftKeyword', keyword);
+                "
+                class="hover-opacity py-2 px-3 w-100 text-ellipsis"
+            >
                 搜"<span class="text-black">{{ keyword }}</span
                 >"相关的结果 >
             </div>
@@ -77,13 +84,13 @@ export default defineComponent({
         const store = useStore();
         const state = reactive({
             searchSuggestObj: {},
-            isLoading: false
+            isLoading: false,
         });
         watch(
             () => props.keyword,
             newV => {
                 state.isLoading = true;
-                searchSuggestApi(newV).then((res: any) => {
+                searchSuggestApi({ keywords: newV }).then((res: any) => {
                     state.isLoading = false;
                     if (res.code === 200) {
                         state.searchSuggestObj = res.result;

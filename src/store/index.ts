@@ -2,6 +2,7 @@ import { getAccountInfo, getUserDetail as getUserDetailForAPi, logout as logoutF
 import { getSongUrlApi } from "@/api/song";
 import { AxiosResponseProps } from "@/utils/request";
 import { createStore } from "vuex";
+import { getLikeList as getLikeListApi } from "@/api/login";
 
 const store = createStore({
     state: {
@@ -18,6 +19,7 @@ const store = createStore({
         isMusicPlaying: false,
         showPlayList: false,
         loginModalVisible: false,
+        likedMusicList: [],
     },
     getters: {
         getTheme(state) {
@@ -87,6 +89,9 @@ const store = createStore({
         changeLoginModalVisible(state, val) {
             state.loginModalVisible = val;
         },
+        changeLikedMusicList(state, val) {
+            state.likedMusicList = val;
+        },
     },
     actions: {
         getUserInfo({ commit }, params) {
@@ -149,6 +154,14 @@ const store = createStore({
                     }
                 });
             }
+        },
+        async getLikedMusicList({ commit, state }) {
+            return await getLikeListApi().then((res: any) => {
+                if (res.code === 200) {
+                    commit("changeLikedMusicList", res.ids);
+                    return res.ids;
+                }
+            });
         },
     },
     modules: {},

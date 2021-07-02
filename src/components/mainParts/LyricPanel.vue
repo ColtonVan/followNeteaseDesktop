@@ -11,7 +11,7 @@
                 </div>
                 <div></div>
             </div>
-            <div class="diskOuter position-relative">
+            <div class="diskOuter position-relative me-5">
                 <div
                     class="diskNeedle bg-base position-absolute"
                     :class="{ pausedNeedle: !isPlaying }"
@@ -25,9 +25,9 @@
             </div>
             <div
                 ref="centerLyric"
-                class="centerLyric d-flex flex-column align-items-center overflow-scroll hideScrollBar text-center canSelect flex-shrink-0"
+                class="centerLyric d-flex flex-column align-items-center overflow-scroll hideScrollBar text-center canSelect flex-shrink-0 mx-5"
             >
-                <div style="transition: transform ease 0.4s;" :style="{ transform: `translateY(${lyricAreaTranslateY}px)` }">
+                <div style="transition: transform ease 0.4s;">
                     <div
                         class="lyricItem flex-shrink-0"
                         :class="{ 'fw-bold': item.active, 'fs-4': item.active }"
@@ -38,7 +38,7 @@
                     </div>
                 </div>
             </div>
-            <div v-if="!collapseLyricSider" class="similarList d-flex flex-column me-5">
+            <div v-if="!collapseLyricSider" class="similarList d-flex flex-column mx-5">
                 <div class="mb-4 fw-bold fs-5">和这首歌相似的歌单</div>
                 <div
                     class="similarListItem rounded-2 d-flex align-items-center p-2 text-ellipsis box-border"
@@ -70,7 +70,6 @@
 import { computed, defineComponent, reactive, toRefs, watch, ref } from "vue";
 import { useStore } from "vuex";
 import { getSongLyricApi } from "@/api/song";
-import { AxiosResponseProps } from "@/utils/request";
 import { getSimilarPlayListApi } from "@/api/playList";
 import { fromLyricStrToTime } from "@/hooks/useFilters";
 import router from "@/router";
@@ -107,7 +106,8 @@ export default defineComponent({
             }),
             centerLyric: ref(null),
             preLyricItem: {},
-            lyricAreaTranslateY: 0,
+            lyricAreaScrollTop: 0,
+            lyricScrollTimer: null,
         });
         //持久化是否折叠歌词侧边栏变量
         state.collapseLyricSider = localStorage["collapseLyricSider"] ? JSON.parse(localStorage["collapseLyricSider"]) : false;
@@ -117,6 +117,30 @@ export default defineComponent({
                 localStorage["collapseLyricSider"] = newV;
             }
         );
+        const animateScrollTop = (domRef, propObj, aniTime) => {
+            if (state.lyricScrollTimer) clearInterval(state.lyricScrollTimer);
+            state.lyricScrollTimer = null;
+            Object.entries(propObj).forEach(([propKey, propVal]: [string, number], index) => {
+                if (domRef[propKey] <= propVal) {
+                    state.lyricScrollTimer = setInterval(() => {
+                        if (propObj.scrollTop && domRef.scrollTop == domRef.scrollHeight - domRef.clientHeight) {
+                            clearInterval(state.lyricScrollTimer);
+                            return setTimeout(() => {
+                                domRef[propKey] = propVal;
+                            }, aniTime);
+                        }
+                        if (domRef[propKey] >= propVal) {
+                            return clearInterval(state.lyricScrollTimer);
+                        }
+                        domRef[propKey] += (propVal * 16) / aniTime;
+                    }, 16);
+                } else {
+                    setTimeout(() => {
+                        domRef[propKey] = propVal;
+                    }, aniTime);
+                }
+            });
+        };
         //监听当前播放进度
         watch(
             () => props.currentTime,
@@ -141,7 +165,8 @@ export default defineComponent({
                 });
                 let currentLyricItem = state.songLyricList.find(item => item.active);
                 if (currentLyricItem?.time != state.preLyricItem?.time) {
-                    state.lyricAreaTranslateY = currentLyricItem?.translateY;
+                    state.lyricAreaScrollTop = currentLyricItem?.scrollTop;
+                    animateScrollTop(state.centerLyric, { scrollTop: currentLyricItem?.scrollTop }, 800);
                 }
                 state.preLyricItem = currentLyricItem;
             }
@@ -155,7 +180,7 @@ export default defineComponent({
                             time: splitArr[0].substr(1),
                             lyricItem: splitArr[1],
                             active: false,
-                            translateY: 0 - (18 + 20) * index,
+                            scrollTop: (18 + 20) * index,
                         };
                     });
                 }
@@ -198,7 +223,7 @@ $playBarHeight: 75px;
     top: $playBarHeight;
     width: 100vw;
     height: calc(100vh - #{$playBarHeight});
-    background: linear-gradient(to bottom, rgb(218, 204, 204), #fff);
+    background: linear-gradient(to bottom, #b8d0d2, #fff);
     transition: top ease 0.4s;
     .lyricContainer {
         height: calc(100% - 75px);
@@ -268,7 +293,6 @@ $playBarHeight: 75px;
         .similarList {
             width: 300px;
             margin-top: 120px;
-            margin-left: 90px;
             .similarListItem {
                 width: 100%;
                 img {
