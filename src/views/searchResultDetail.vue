@@ -96,13 +96,14 @@ export default defineComponent({
         });
         watch(
             () => state.keywords,
-            newV => {
+            async newV => {
                 if (newV) {
                     cloudsearchApi({ keywords: newV, type: 1 }).then(async (res: any) => {
                         if (res.code === 200) {
                             state.dataSource = await addHaveUrl(res.result.songs || []);
                         }
                     });
+                    await store.dispatch("getLikedMusicList");
                 }
             },
             {
@@ -110,16 +111,18 @@ export default defineComponent({
             }
         );
         const collectMusic = (like, id) => {
-            likeMusic({ id, like }).then(async (res: any) => {
-                if (res.code === 200) {
-                    await store.dispatch("getLikedMusicList");
-                    state.toastRef.success(like ? "已添加到我喜欢的音乐" : "取消喜欢成功");
-                }else{
-                    state.toastRef.error(like ? "添加失败" : "取消喜欢失败");    
-                }
-            }).catch(err=>{
-                state.toastRef.error("请求失败");
-            })
+            likeMusic({ id, like })
+                .then(async (res: any) => {
+                    if (res.code === 200) {
+                        await store.dispatch("getLikedMusicList");
+                        state.toastRef.success(like ? "已添加到我喜欢的音乐" : "取消喜欢成功");
+                    } else {
+                        state.toastRef.error(like ? "添加失败" : "取消喜欢失败");
+                    }
+                })
+                .catch(err => {
+                    state.toastRef.error("请求失败");
+                });
         };
         const handleDownloadMusic = ({ id, name }) => {
             getSongUrlApi({ id }).then((res: AxiosResponseProps) => {
