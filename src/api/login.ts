@@ -56,3 +56,23 @@ export const getUserFollowsApi = (params: { limit: number; offset: number } = { 
         }
     });
 };
+// 返回结果的type参数对应:
+// 18 分享单曲
+// 19 分享专辑
+// 17、28 分享电台节目
+// 22 转发
+// 39 发布视频
+// 35、13 分享歌单
+// 24 分享专栏文章
+// 41、21 分享视频
+export const getUserEventApi = (params: { limit: number; lasttime: number } = { limit: 10, lasttime: -1 }) => {
+    return getAccountInfo().then(async (res: any) => {
+        if (res.code === 200 && res.account && res.account.id) {
+            return await axiosInstance.get("/user/event", {
+                params: { ...params, uid: res.account.id, limit: params.limit, lasttime: params.lasttime, timeStamp: Date.now() },
+            });
+        } else {
+            return { code: 200 };
+        }
+    });
+};

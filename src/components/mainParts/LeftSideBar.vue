@@ -159,6 +159,7 @@ export default defineComponent({
             {
                 title: "朋友",
                 key: "py",
+                path: "/container/friends"
             },
             {
                 title: "直播",
