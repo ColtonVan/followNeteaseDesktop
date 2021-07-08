@@ -264,7 +264,7 @@ export default defineComponent({
             };
             //播放出错时触发
             state.audioTag.onerror = (err: Error) => {
-                console.dir(err);
+                // console.dir(err);
                 // state.toastRef.warn("播放失败，请稍后重试");
             };
             //当前歌曲播放完毕时触发
