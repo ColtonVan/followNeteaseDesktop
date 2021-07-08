@@ -25,6 +25,13 @@ class HttpRequest {
       }
       interceptors(instance: AxiosInstance) {
             let requestList = [];
+            const setLoadingToFalse = (response) => {
+                  requestList.filter(item => item.url == response.config.url && item.method == response.config.method).forEach(
+                        item => (item.isLoading = false)
+                  );
+                  //所有请求都加载完才让加载提示消失
+                  if (requestList.every(item => !item.isLoading)) store.commit("changeIsLoading", false);
+            };
             instance.interceptors.request.use(
                   config => {
                         let ignoreLoadingUrls = ["/login/qr/check", "/search/hot/detail", "/search/suggest"];
@@ -42,13 +49,11 @@ class HttpRequest {
             );
             instance.interceptors.response.use(
                   response => {
-                        requestList.filter(item => item.url == response.config.url && item.method == response.config.method).forEach(item => (item.isLoading = false));
-                        //所有请求都加载完才让加载提示消失
-                        if (requestList.every(item => !item.isLoading)) store.commit("changeIsLoading", false);
+                        setLoadingToFalse(response);
                         return response.data as AxiosResponse<AxiosResponseProps>;
                   },
                   error => {
-                        store.commit("changeIsLoading", false);
+                        setLoadingToFalse(error);
                         Promise.reject(error);
                   }
             );
