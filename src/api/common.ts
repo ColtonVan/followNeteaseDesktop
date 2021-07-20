@@ -8,3 +8,6 @@ export const getEventApi = (params: { pagesize: number; lasttime: number } = { p
     //t : 1为关注,其他为取消关注
     return axiosIns.get("/event", { params: { ...params, timeStamp: Date.now() } });
 };
+export const getCountriesCodeListApi = () => {
+    return axiosIns.get("/countries/code/list");
+};

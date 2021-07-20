@@ -52,6 +52,11 @@ const routes: Array<RouteRecordRaw> = [
                         name: "searchResultDetail",
                         component: () => import("@/views/searchResultDetail.vue"),
                     },
+                    {
+                        path: "/container/updateMusicList",
+                        name: "updateMusicList",
+                        component: () => import("@/views/updateMusicList.vue"),
+                    }
                 ],
             },
             {

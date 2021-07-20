@@ -25,10 +25,10 @@ class HttpRequest {
       }
       interceptors(instance: AxiosInstance) {
             let requestList = [];
-            const setLoadingToFalse = (response) => {
-                  requestList.filter(item => item.url == response.config.url && item.method == response.config.method).forEach(
-                        item => (item.isLoading = false)
-                  );
+            const setLoadingToFalse = response => {
+                  requestList
+                        .filter(item => item.url == response.config.url && item.method == response.config.method)
+                        .forEach(item => (item.isLoading = false));
                   //所有请求都加载完才让加载提示消失
                   if (requestList.every(item => !item.isLoading)) store.commit("changeIsLoading", false);
             };
@@ -50,11 +50,11 @@ class HttpRequest {
             instance.interceptors.response.use(
                   response => {
                         setLoadingToFalse(response);
-                        return response.data as AxiosResponse<AxiosResponseProps>;
+                        return response.data;
                   },
                   error => {
                         setLoadingToFalse(error);
-                        Promise.reject(error);
+                        return Promise.reject(error.response?.data);
                   }
             );
       }

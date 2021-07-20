@@ -1,5 +1,5 @@
 <template>
-    <div class="main vw-100 vh-100 position-relative" :class="{ [theme]: allowTheme }">
+    <div id="main" class="main vw-100 vh-100 position-relative" :class="{ [theme]: allowTheme }">
         <Nav />
         <router-view></router-view>
         <RequestLoading />

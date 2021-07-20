@@ -38,6 +38,7 @@ export default defineComponent({
             state.icon = "warn";
             startAni();
         };
+        const error = warn;
         let timer1 = null;
         let timer2 = null;
         const startAni = () => {
@@ -61,7 +62,8 @@ export default defineComponent({
         return {
             ...toRefs(state),
             success,
-            warn
+            warn,
+            error
         };
     },
 });
