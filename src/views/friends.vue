@@ -2,11 +2,11 @@
       <HorizontalNav :navs="navs" />
       <div class="d-flex justify-content-between friends hideScrollBar pt-3">
             <div class="flex-1 eventContent pe-5">
-                  <div class="eventItem border-bottom pb-5 pt-3 d-flex canSelect" v-for="event in events" :key="event.id">
+                  <div class="eventItem border-bottom pb-4 pt-3 d-flex canSelect" v-for="event in events" :key="event.id">
                         <div class="me-3">
                               <img class="rounded-circle" width="43" height="43" :src="event.user?.avatarUrl" alt="" />
                         </div>
-                        <div class="position-relative w-100">
+                        <div class="position-relative w-100 rightContent">
                               <div>
                                     <span class="colorA me-2">{{ event.actName }}</span>
                                     <span>{{ mapEventName(event.type) }}</span>
@@ -39,7 +39,7 @@
                                           :src="img.originUrl"
                                     />
                               </div>
-                              <div class="d-flex position-absolute end-0" style="bottom: -20px;">
+                              <div class="d-flex justify-content-end operatedRow">
                                     <div class="pe-4 flex-center hover-opacity">
                                           <PraiseIcon width="12" height="12" />
                                           （{{ event.info.likedCount }}）
@@ -53,6 +53,7 @@
                                           （{{ event.info.commentCount }}）
                                     </div>
                               </div>
+                              <CommonComment />
                         </div>
                   </div>
             </div>
@@ -118,7 +119,13 @@ export default defineComponent({
                   .richText {
                         white-space: pre-wrap;
                   }
-                  .eventPicsItem {
+                  .rightContent {
+                        .eventPicsItem {
+
+                        }
+                        .operatedRow{
+                              margin-top: 20px;
+                        }
                   }
             }
       }
