@@ -87,7 +87,10 @@
                     <HollowPlayIcon width="12" height="12" />
                     <span class="text-white ms-1 flex-shrink-0">{{ playCount(rec.playCount) }}</span>
                 </div>
-                <div class="position-absolute rounded-circle hover-play justify-content-center align-items-center">
+                <div
+                    @click.stop="$router.push({ path: '/container/createdMusicList', query: { id: rec.id, immediate: true } })"
+                    class="position-absolute rounded-circle hover-play justify-content-center align-items-center"
+                >
                     <div class="trigonalPlay"></div>
                 </div>
             </div>

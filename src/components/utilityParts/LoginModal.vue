@@ -258,7 +258,7 @@ export default defineComponent({
       top: 42vh;
       transform: translate(-50%, -50%);
       z-index: 998;
-      background-color: #f3f4f6;
+      background-color: #fff;
       > svg:first-child {
             position: absolute;
             top: 9px;
@@ -307,6 +307,7 @@ export default defineComponent({
             }
       }
       .accountMethod {
+            background-color: #f3f4f6;
             .qrdemo {
                   left: 8px;
                   top: 8px;

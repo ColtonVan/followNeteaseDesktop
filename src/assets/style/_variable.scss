@@ -2,8 +2,10 @@ $primary: #ec4141;
 $dark: #212529;
 $free: #50c475;
 $colors: (
-      primary: $primary,
-      dark: $dark,
-      free: $free,
+    primary: $primary,
+    dark: $dark,
+    free: $free,
+    hovergrey: #f3f3f3,
 );
-$cursors: "pointer", "cell", "col-resize", "copy", "crosshair", "grab", "move", "zoom-in", "zoom-out";
+$cursors: pointer, cell, col-resize, copy, crosshair, grab, move, zoom-in, zoom-out;
+$objectFitValues: fill, contain, cover, none, scale-down;

@@ -11,3 +11,12 @@ export const getEventApi = (params: { pagesize: number; lasttime: number } = { p
 export const getCountriesCodeListApi = () => {
     return axiosIns.get("/countries/code/list");
 };
+//心动模式/智能播放
+//必选参数
+//id : 歌曲 id
+//pid : 歌单 id
+//可选参数
+//sid : 要开始播放的歌曲的 id
+export const getIntelligenceListApi = (params: { id: number; pid: number; sid?: number }) => {
+    return axiosIns.get("/playmode/intelligence/list", { params });
+};

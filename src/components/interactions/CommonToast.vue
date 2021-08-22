@@ -10,6 +10,9 @@
         <span class="me-3" v-if="icon === 'warn' || icon === 'warnning'">
             <ExclamationIcon width="42" height="42" />
         </span>
+        <span class="me-3" v-if="icon === 'heartbeat'">
+            <HeartBeatIcon color="#fff" width="48" height="48" />
+        </span>
         <span class="text-white fs-5">{{ tips }}</span>
         </div>
     </teleport>
@@ -38,6 +41,12 @@ export default defineComponent({
             state.icon = "warn";
             startAni();
         };
+        const heartbeat = (tips: string, options?: { duration: number }) => {
+            state.duration = options && options.duration && options.duration !== 0 ? options.duration : 1200;
+            state.tips = tips;
+            state.icon = "heartbeat";
+            startAni();
+        };
         const error = warn;
         let timer1 = null;
         let timer2 = null;
@@ -63,7 +72,8 @@ export default defineComponent({
             ...toRefs(state),
             success,
             warn,
-            error
+            error,
+            heartbeat
         };
     },
 });

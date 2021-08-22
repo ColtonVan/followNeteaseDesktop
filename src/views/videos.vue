@@ -1,5 +1,5 @@
 <template>
-    <div class="videos w-100 h-100 d-flex flex-column">
+    <div class="videos w-100 h-100 d-flex flex-column px-5 py-4">
         <HorizontalNav v-model:navs="navs" />
         <div class="d-flex justify-content-between align-align-items-center w-100 position-relative">
             <div

@@ -104,7 +104,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, toRefs, watch } from "vue";
+import { computed, defineComponent, reactive, toRefs } from "vue";
 import useFullScrenn from "@/hooks/useFullScreen";
 import useClickDocument, { useClickOnce } from "@/hooks/useClickDocument";
 import { useStore } from "vuex";
@@ -171,7 +171,6 @@ export default defineComponent({
                   }
             };
             const unshiftKeyword = (searchKeyword: string) => {
-                  console.log(searchKeyword);
                   if (!searchKeyword) return;
                   let searchHistory = localStorage[searchHistoryKey] ? JSON.parse(localStorage[searchHistoryKey]) : [];
                   for (let i = 0; i < searchHistory.length; i++) {

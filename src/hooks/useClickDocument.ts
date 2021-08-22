@@ -45,3 +45,8 @@ export const useDoubleClick = () => {
         clickArr.push(nowDate);
     }
 }
+export const useDocumentContextMenu = (callback)=>{
+    document.addEventListener("contextmenu",event=>{
+        callback(event);
+    })
+}

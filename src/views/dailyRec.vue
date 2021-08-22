@@ -1,26 +1,28 @@
 <template>
-    <div class="dailyRec ps-3 h-100 overflow-scroll hideScrollBar">
-        <div class="m-5 d-flex">
-            <div class="position-relative calendarBox">
-                <CalendarIcon width="90" height="90" :color="calendarColor" />
-                <div class="dateText fw-bold position-absolute start-50 fs-1 translate-middle">
-                    {{ new window.Date().getDate() }}
+    <div class="px-5 py-4">
+        <div class="dailyRec ps-3 h-100 overflow-scroll hideScrollBar">
+            <div class="m-5 d-flex">
+                <div class="position-relative calendarBox">
+                    <CalendarIcon width="90" height="90" :color="calendarColor" />
+                    <div class="dateText fw-bold position-absolute start-50 fs-1 translate-middle">
+                        {{ new window.Date().getDate() }}
+                    </div>
+                </div>
+                <div class="ms-5 d-flex flex-column justify-content-center">
+                    <div class="fs-1">每日歌曲推荐</div>
+                    <div class="text-muted">根据你的音乐口味生成，每天6:00更新</div>
                 </div>
             </div>
-            <div class="ms-5 d-flex flex-column justify-content-center">
-                <div class="fs-1">每日歌曲推荐</div>
-                <div class="text-muted">根据你的音乐口味生成，每天6:00更新</div>
+            <div class="d-flex mb-4 ms-5">
+                <PlayAllListBtn :musicList="dailySongs" />
+                <div @click="colVisible = true" class="collectList ms-3 rounded-pill px-5 border d-flex align-items-center cursor-pointer hover-btn">
+                    <CollectListIcon width="20" height="20" />
+                    <span class="ms-2">收藏全部</span>
+                </div>
             </div>
-        </div>
-        <div class="d-flex mb-4 ms-5">
-            <PlayAllListBtn :musicList="dailySongs" />
-            <div @click="colVisible = true" class="collectList ms-3 rounded-pill px-5 border d-flex align-items-center cursor-pointer hover-btn">
-                <CollectListIcon width="20" height="20" />
-                <span class="ms-2">收藏全部</span>
+            <div class="border-top mb-5">
+                <MusicList :columns="columns" :dataSource="dailySongs" />
             </div>
-        </div>
-        <div class="border-top mb-5">
-            <MusicList :columns="columns" :dataSource="dailySongs" />
         </div>
     </div>
     <CommonModal v-model:visible="downloadModalVisible">

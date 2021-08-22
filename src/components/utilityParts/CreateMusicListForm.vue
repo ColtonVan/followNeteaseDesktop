@@ -20,6 +20,7 @@
             </div>
         </template>
     </CommonModal>
+    <CommonToast ref="commonToastRef" />
 </template>
 
 <script lang="ts">
@@ -47,10 +48,12 @@ export default defineComponent({
             addListModalVisible: computed({
                 get: () => props.visible,
                 set: newV => context.emit("update:visible", newV),
-            })
+            }),
+            commonToastRef: null,
         });
         const confirm = () => {
             const { name, isPrivate } = state.addMusicListObj as { name: string; isPrivate: boolean };
+            if (!name) return state.commonToastRef.warn("歌单名不能为空");
             let params: { name: string; privacy?: number } = { name };
             if (isPrivate) params.privacy = 10;
             createPlayListApi(params).then((res: AxiosResponseProps) => {

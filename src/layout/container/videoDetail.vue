@@ -1,6 +1,6 @@
 <template>
-    <div class="row h-100 flex-center">
-        <div class="h-100 layoutWidth overflow-scroll hideScrollBar d-flex justify-content-between">
+    <div class="videoDetail row flex-center">
+        <div class="h-100 pb-5 layoutWidth overflow-scroll hideScrollBar d-flex justify-content-between">
             <div class="leftArea pe-5">
                 <div class="d-flex align-items-center py-3 cursor-pointer" @click="$router.back()">
                     <arrow-left-icon color="#000000" width="18px" height="18px" />
@@ -64,10 +64,17 @@
             </div>
             <div class="rightArea flex-grow-1 flex-shrink-0">
                 <div class="fs-4 py-3">相关推荐</div>
-                <div v-for="(item, index) in recommendVideoList" :key="index" class="overflow-hidden rounded-3 mb-3 d-flex cursor-pointer">
-                    <div class="recVideoCover bg-base text-white position-relative overflow-hidden rounded-3" :style="{ backgroundImage: `url(${item.data.coverUrl})` }">
+                <div
+                    v-for="(item, index) in recommendVideoList"
+                    :key="index"
+                    class="recVideoItem overflow-hidden rounded-3 mb-3 d-flex cursor-pointer"
+                >
+                    <div
+                        class="recVideoCover bg-base text-white position-relative overflow-hidden rounded-3"
+                        :style="{ backgroundImage: `url(${item.data.coverUrl})` }"
+                    >
                         <div class="position-absolute top-0 end-0 pe-1 pt-1 d-flex align-items-center">
-                            <hollow-play-icon width="11px" height="11px" class="translate-y--20"/>
+                            <hollow-play-icon width="11px" height="11px" class="translate-y--20" />
                             <span class="ms-1">{{ playCount(item.data.praisedCount) }}</span>
                         </div>
                         <div class="position-absolute bottom-0 end-0 pe-1 pb-1">
@@ -235,49 +242,57 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-.leftArea {
-    width: calc(21 * 29px);
-    box-sizing: content-box;
-    video {
-        background-color: #000000;
+.videoDetail {
+    height: calc(100vh - 60px);
+    .leftArea {
         width: calc(21 * 29px);
-        height: calc(12 * 29px);
-    }
-    .videoAvatar {
-        width: 48px;
-        height: 48px;
-        background-size: cover;
-        background-repeat: no-repeat;
-    }
-    .haveFocus {
-        background-color: rgb(231, 231, 231);
-    }
-    .groupTag {
-        background-color: rgb(238, 238, 238);
-        padding: 2px 0;
-        margin-bottom: 8px;
-    }
-    .groupTag ~ .groupTag {
-        margin-left: 8px;
-    }
-    .opBtn {
-        &:hover {
-            background-color: rgba($color: #cccccc, $alpha: 0.12);
+        box-sizing: content-box;
+        video {
+            background-color: #000000;
+            width: calc(21 * 29px);
+            height: calc(12 * 29px);
+        }
+        .videoAvatar {
+            width: 48px;
+            height: 48px;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+        .haveFocus {
+            background-color: rgb(231, 231, 231);
+        }
+        .groupTag {
+            background-color: rgb(238, 238, 238);
+            padding: 2px 0;
+            margin-bottom: 8px;
+        }
+        .groupTag ~ .groupTag {
+            margin-left: 8px;
+        }
+        .opBtn {
+            &:hover {
+                background-color: rgba($color: #cccccc, $alpha: 0.12);
+            }
+        }
+        .opBtn ~ .opBtn {
+            margin-left: 8px;
         }
     }
-    .opBtn ~ .opBtn {
-        margin-left: 8px;
-    }
-}
-.rightArea {
-    .recVideoCover {
-        width: 140px;
-        height: 80px;
-    }
-    .recVideoInfo{
-        width: 140px;
-        >div:first-child{
-            @include ellipsis(2);
+    .rightArea {
+        .recVideoItem {
+            .recVideoCover {
+                width: 140px;
+                height: 80px;
+            }
+            .recVideoInfo {
+                width: 140px;
+                > div:first-child {
+                    @include ellipsis(2);
+                }
+            }
+        }
+        .recVideoItem:last-of-type{
+            padding-bottom: 1rem;
         }
     }
 }

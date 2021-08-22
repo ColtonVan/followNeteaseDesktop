@@ -44,8 +44,8 @@ export const addHaveUrl = async originalList => {
                     }
                 });
             });
-            return originalList;
         }
+        return originalList;
     });
 };
 export const fromLyricStrToTime = timeStr => {
@@ -68,7 +68,7 @@ export const fromLyricStrToTime = timeStr => {
 // 35、13 分享歌单
 // 24 分享专栏文章
 // 41、21 分享视频
-export const mapEventName = (type) => {
+export const mapEventName = type => {
     interface TypeObj {
         name: string;
         types: number[];

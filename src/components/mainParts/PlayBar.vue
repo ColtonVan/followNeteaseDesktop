@@ -177,7 +177,8 @@ export default defineComponent({
         });
         const playMusic = () => {
             if (!state.currentMusicUrl) {
-                return state.toastRef.warn("请先选择要播放的音乐");
+                if (!state.currentPlayList.length) return state.toastRef.warn("请先选择要播放的音乐");
+                changeMusic("next");
             }
             nextTick(() => {
                 state.audioTag.play().catch(err => {
@@ -413,7 +414,7 @@ export default defineComponent({
             }
         }
         .rightController {
-            width: 180px;
+            width: 260px;
         }
     }
 }

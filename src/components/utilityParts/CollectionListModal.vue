@@ -26,7 +26,7 @@
                     :key="index"
                     @click="addToList(item)"
                 >
-                    <img class="rounded me-3" width="56" :src="item.coverImgUrl" alt="" />
+                    <img class="rounded me-3 object-fit-cover" width="56" height="56" :src="item.coverImgUrl" alt="" />
                     <div>
                         <div>{{ item.name }}</div>
                         <div class="text-muted mt-1">{{ item.trackCount }}首音乐</div>

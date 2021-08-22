@@ -2,16 +2,15 @@
     <div :class="{ showLyricPanel: visible }" class="lyricPanel position-absolute">
         <Nav type="lyricPanel" @ondrop="$emit('update:visible', false)" />
         <div class="lyricContainer d-flex justify-content-center w-100">
-            <div class="lyricHeader position-absolute start-50 translate-middle-x pt-4 d-flex flex-column align-items-center">
+            <div class="lyricHeader canSelect position-absolute start-50 translate-middle-x pt-4 d-flex flex-column align-items-center">
                 <div class="fs-2 w-100 text-ellipsis text-center">{{ currentMusicDetail.name }}</div>
                 <div class="mt-1 text-muted w-100 text-ellipsis text-center">
                     <span>{{ currentMusicDetail.ar.map(item => item.name).join("、") }}</span>
                     <span> - </span>
                     <span>{{ currentMusicDetail.al.name }}</span>
                 </div>
-                <div></div>
             </div>
-            <div class="diskOuter position-relative me-5">
+            <div class="diskOuter position-relative mx-5">
                 <div
                     class="diskNeedle bg-base position-absolute"
                     :class="{ pausedNeedle: !isPlaying }"
@@ -38,7 +37,7 @@
                     </div>
                 </div>
             </div>
-            <div v-if="!collapseLyricSider" class="similarList d-flex flex-column mx-5">
+            <div v-if="!collapseLyricSider" class="similarList d-flex flex-column mx-5 flex-shrink-0">
                 <div class="mb-4 fw-bold fs-5">和这首歌相似的歌单</div>
                 <div
                     class="similarListItem rounded-2 d-flex align-items-center p-2 text-ellipsis box-border"
@@ -52,9 +51,8 @@
                 </div>
             </div>
             <div class="collapseBtnArea position-absolute d-flex align-items-center ms-5">
-                <div class="rounded-pill flex-center" @click="collapseLyricSider = !collapseLyricSider">
+                <div class="rounded-pill flex-center cursor-pointer" @click="collapseLyricSider = !collapseLyricSider">
                     <CollapseSiderIcon
-                        class="cursor-pointer"
                         :class="{ 'rotate-180': !collapseLyricSider }"
                         width="22px"
                         height="22px"
@@ -174,6 +172,7 @@ export default defineComponent({
         const getSongLyric = () => {
             getSongLyricApi({ id: state.currentMusicDetail.id }).then((res: any) => {
                 if (res.code === 200) {
+                    if(!res.lrc)return state.songLyricList = [];
                     state.songLyricList = res.lrc.lyric.split("\n").map((item, index) => {
                         let splitArr = item.split("]");
                         return {
@@ -244,7 +243,7 @@ $playBarHeight: 75px;
                 z-index: 1;
                 transform: rotate(0);
                 transition: transform ease 0.4s;
-                transform-origin: 13px 13px;
+                transform-origin: 14px 14px;
             }
             .pausedNeedle {
                 transform: rotate(-38deg);
@@ -282,7 +281,7 @@ $playBarHeight: 75px;
         .centerLyric {
             width: 600px;
             height: 380px;
-            margin-top: 200px;
+            margin-top: 126px;
             padding-top: 40px;
             .lyricItem {
                 min-width: 60px;

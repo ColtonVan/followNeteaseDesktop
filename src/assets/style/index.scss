@@ -13,7 +13,7 @@ a {
     color: #0c73c2;
     text-decoration: none;
 }
-.colorA{
+.colorA {
     color: #0c73c2;
 }
 .bg-base {
@@ -95,6 +95,11 @@ a {
         background-color: #{$val};
     }
 }
+@each $value in $objectFitValues {
+    .object-fit-#{$value} {
+        object-fit: #{$value};
+    }
+}
 $utilities: (
     "opacity": (
         property: opacity,
@@ -110,6 +115,7 @@ $utilities: (
         property: width,
         class: vw,
         values: (
+            0: 0,
             25: 25vw,
             50: 50vw,
             75: 75vw,

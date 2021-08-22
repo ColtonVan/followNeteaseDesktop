@@ -1,5 +1,6 @@
 <template>
-    <div class="flex-shrink-0 routerContainer position-relative px-5 py-4">
+    <!-- px-5 py-4 -->
+    <div class="flex-shrink-0 routerContainer position-relative">
         <router-view></router-view>
         <transition name="playList">
             <PlayList v-if="$store.state.showPlayList" />
@@ -20,13 +21,16 @@ export default defineComponent({
     width: calc(100vw - 200px);
     min-width: 600px;
     overflow-x: hidden;
-    .playList-enter-active,.playList-leave-active {
+    .playList-enter-active,
+    .playList-leave-active {
         transition: right 0.3s ease;
     }
-    .playList-enter-from,.playList-leave-to{
+    .playList-enter-from,
+    .playList-leave-to {
         right: -416px;
     }
-    .playList-enter-to,.playList-leave-from{
+    .playList-enter-to,
+    .playList-leave-from {
         right: 0;
     }
 }

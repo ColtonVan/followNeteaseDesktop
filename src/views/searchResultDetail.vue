@@ -1,25 +1,27 @@
 <template>
-    <HorizontalNav :navs="navs" />
-    <musicList
-        :columns="columns"
-        :dataSource="dataSource?.map((item, index) => ({ ...item, index: index }))"
-        emptyText="暂无搜索结果，搜搜其他关键词吧~"
-    >
-        <template #toolBar="{id:musicId,index,name}">
-            <span class="text-muted me-3">{{ String(index + 1).padStart(2, "0") }}</span>
-            <span class="me-3">
-                <LikedIcon
-                    class="cursor-pointer"
-                    v-if="!likedMusicList.includes(musicId)"
-                    @click="collectMusic(true, musicId)"
-                    width="15"
-                    height="15"
-                />
-                <HaveLikedIcon class="cursor-pointer" v-else @click="collectMusic(false, musicId)" width="15" height="15" />
-            </span>
-            <DownloadMusicIcon @click="handleDownloadMusic({ id: musicId, name })" class="cursor-pointer" width="15" height="15" />
-        </template>
-    </musicList>
+    <div class="px-5 py-4">
+        <HorizontalNav :navs="navs" />
+        <musicList
+            :columns="columns"
+            :dataSource="dataSource?.map((item, index) => ({ ...item, index: index }))"
+            emptyText="暂无搜索结果，搜搜其他关键词吧~"
+        >
+            <template #toolBar="{id:musicId,index,name}">
+                <span class="text-muted me-3">{{ String(index + 1).padStart(2, "0") }}</span>
+                <span class="me-3">
+                    <LikedIcon
+                        class="cursor-pointer"
+                        v-if="!likedMusicList.includes(musicId)"
+                        @click="collectMusic(true, musicId)"
+                        width="15"
+                        height="15"
+                    />
+                    <HaveLikedIcon class="cursor-pointer" v-else @click="collectMusic(false, musicId)" width="15" height="15" />
+                </span>
+                <DownloadMusicIcon @click="handleDownloadMusic({ id: musicId, name })" class="cursor-pointer" width="15" height="15" />
+            </template>
+        </musicList>
+    </div>
     <CommonToast ref="toastRef" />
 </template>
 

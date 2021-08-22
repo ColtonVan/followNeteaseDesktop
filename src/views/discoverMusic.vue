@@ -1,5 +1,5 @@
 <template>
-    <div class="h-100 w-100 d-flex flex-column">
+    <div class="h-100 w-100 d-flex flex-column px-5 py-4">
         <HorizontalNav v-model:navs="navs" />
         <div class="flex-grow-1 overflow-scroll hideScrollBar">
             <div class="container">
