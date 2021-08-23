@@ -1,17 +1,26 @@
 <template>
     <!-- px-5 py-4 -->
-    <div class="flex-shrink-0 routerContainer position-relative">
+    <div id="routerContainer" class="flex-shrink-0 routerContainer position-relative hideScrollBar">
         <router-view></router-view>
         <transition name="playList">
             <PlayList v-if="$store.state.showPlayList" />
         </transition>
+        <CustomScrollBar v-if="!isLoading && !['personalizedRec','videos'].includes($route.name)" listId="routerContainer" />
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import store from "@/store";
+import { computed, defineComponent, reactive, toRefs } from "vue";
 export default defineComponent({
-    setup() {},
+    setup() {
+        const state = reactive({
+            isLoading: computed(() => store.state.isLoading),
+        });
+        return {
+            ...toRefs(state),
+        };
+    },
 });
 </script>
 
@@ -20,7 +29,7 @@ export default defineComponent({
     height: calc(100vh - 75px - 60px);
     width: calc(100vw - 200px);
     min-width: 600px;
-    overflow-x: hidden;
+    overflow-y: scroll;
     .playList-enter-active,
     .playList-leave-active {
         transition: right 0.3s ease;

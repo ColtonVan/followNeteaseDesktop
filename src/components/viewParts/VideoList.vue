@@ -1,5 +1,5 @@
 <template>
-    <div v-loadMore="scrollList" class="videoList hideScrollBar overflow-scroll w-100 d-flex flex-wrap justify-content-between align-items-start">
+    <div v-loadMore="scrollList" id="videoList" class="videoList hideScrollBar position-relative px-2 overflow-scroll w-100 d-flex flex-wrap justify-content-between align-items-start">
         <div
             @mouseenter="item.showPre = true"
             @mouseleave="item.showPre = false"
@@ -26,6 +26,7 @@
                 <div class="videoDes text-secondary opacity-50">by {{ item.data.creator?.nickname }}</div>
             </div>
         </div>
+        <CustomScrollBar listId="videoList"/>
     </div>
 </template>
 

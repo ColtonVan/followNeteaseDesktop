@@ -1,7 +1,8 @@
 <template>
     <div
         @contextmenu.stop="$event.preventDefault ? $event.preventDefault() : ($event.returnValue = false)"
-        class="leftSideBar hideScrollBar border-end ps-3 pe-1 pt-2 fs-5 flex-shrink-0"
+        id="leftSideBar"
+        class="leftSideBar position-relative hideScrollBar border-end ps-3 pe-1 pt-2 fs-5 flex-shrink-0"
     >
         <div
             class="mt-1 p-2 cursor-pointer rounded hover-menuItem"
@@ -157,6 +158,7 @@
                 <span>{{ item.name }}</span>
             </div>
         </div>
+        <CustomScrollBar class="customScrollBar" v-if="collectedMusicList.length" listId="leftSideBar" />
     </div>
 
     <CreateMusicListForm v-model:visible="addListModalVisible" v-model:formData="addMusicListObj" @complete="completeCreate" />
@@ -431,6 +433,16 @@ export default defineComponent({
     width: 200px;
     height: calc(100vh - 75px - 60px);
     overflow-y: scroll;
+    &:active,&:hover {
+        .customScrollBar {
+            opacity: 1;
+            transition: none;
+        }
+    }
+    .customScrollBar {
+        opacity: 0;
+        transition: opacity ease 0.4s;
+    }
     .hover-menuItem {
         &:hover {
             background-color: #f3f3f3;

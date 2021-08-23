@@ -1,7 +1,7 @@
 <template>
     <div class="h-100 w-100 d-flex flex-column px-5 py-4">
         <HorizontalNav v-model:navs="navs" />
-        <div class="flex-grow-1 overflow-scroll hideScrollBar">
+        <div id="discoverMusicList" class="flex-grow-1 overflow-scroll hideScrollBar position-relative">
             <div class="container">
                 <div class="row d-flex flex-column align-items-center">
                     <div class="col-xxl-10 containerCol">
@@ -9,11 +9,13 @@
                     </div>
                 </div>
             </div>
+            <CustomScrollBar v-if="!isLoading" listId="discoverMusicList" />
         </div>
     </div>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from "vue";
+import store from "@/store";
+import { computed, defineComponent, reactive, toRefs } from "vue";
 export default defineComponent({
     setup() {
         const state = reactive({
@@ -44,6 +46,7 @@ export default defineComponent({
                     path: "",
                 },
             ],
+            isLoading: computed(() => store.state.isLoading),
         });
         return {
             ...toRefs(state),
