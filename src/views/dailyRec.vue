@@ -61,9 +61,11 @@ import { useStore } from "vuex";
 import { downloadMusic as downloadMusicFun } from "@/utils/file";
 import { musicQuality } from "@/hooks/useFilters";
 import { AxiosResponseProps } from "@/utils/request";
+import { useRoute } from "vue-router";
 export default defineComponent({
     setup() {
         const store = useStore();
+        const route = useRoute();
         const state = reactive({
             dailySongs: [],
             downloadModalVisible: false,
@@ -114,12 +116,20 @@ export default defineComponent({
                 getRecommendSongsApi({ t: Date.now() }).then(async (res: AxiosResponseProps) => {
                     if (res.code === 200) {
                         state.dailySongs = await addHaveUrl(res.data.dailySongs);
+                        const immediate = route.query.immediate;
+                        if (immediate && res?.data?.dailySongs?.length) {
+                            store.commit("changeCurrentMusicDetail", res.data.dailySongs[0]);
+                            store.commit("changeCurrentPlayList", [
+                                ...JSON.parse(JSON.stringify(res.data.dailySongs)),
+                                ...store.state.currentPlayList,
+                            ]);
+                            store.dispatch("getCurrentMusicUrlInfo", { id: res.data.dailySongs[0].id });
+                        }
                         resolve(res);
                     }
                 });
             });
         };
-        getRec();
         const getLikeList: () => Promise<AxiosResponseProps> = () => {
             return new Promise((resolve, reject) => {
                 getLikeListApi().then((res: any) => {
@@ -130,7 +140,11 @@ export default defineComponent({
                 });
             });
         };
-        getLikeList();
+        const initPageData = () => {
+            getRec();
+            getLikeList();
+        };
+        initPageData();
         const calendarColor = computed(() =>
             store.getters.getTheme === "primaryTheme" ? "#ec4141" : store.getters.getTheme === "darkTheme" ? "#212529" : "#50c475"
         );

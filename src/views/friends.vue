@@ -1,8 +1,9 @@
 <template>
     <div class="d-flex justify-content-between friends hideScrollBar">
-        <div class="flex-1 eventContent px-5 py-4">
+        <div class="flex-1 eventContent px-5 py-4 w-100">
             <HorizontalNav :navs="navs" />
-            <div class="eventItem border-bottom pb-4 pt-3 d-flex canSelect" v-for="event in events" :key="event.id">
+            <div v-if="!events.length" class="text-black-50 text-center noEvents">暂无动态</div>
+            <div v-else class="eventItem border-bottom pb-4 pt-3 d-flex canSelect" v-for="event in events" :key="event.id">
                 <div class="me-3">
                     <img class="rounded-circle" width="43" height="43" :src="event.user?.avatarUrl" alt="" />
                 </div>
@@ -57,24 +58,51 @@
                 </div>
             </div>
         </div>
-        <div class="rightEvent border-start">
-            <UserInfoCardForFriends />
+        <div class="rightEvent border-start flex-shrink-0">
+            <UserInfoCardForFriends v-if="loginStatus" />
+            <div v-else class="d-flex px-4 flex-column align-items-center">
+                <img class="mt-5 w-100" :src="require('@/assets/img/platform.png')" alt="" />
+                <div class="text-black-50 my-3 text-center">登录NoteMusic,可以享受无限收藏的乐趣，并且无限同步到手机</div>
+                <div
+                    @click="$store.commit('changeLoginModalVisible', true)"
+                    class="loginBtn fs-5 w-100 text-white cursor-pointer text-center rounded-pill bg-primary"
+                >
+                    立即登录
+                </div>
+            </div>
+            <div class="w-100" v-if="hotTopics?.length">
+                <div class="px-4 d-flex justify-content-between pt-4 pb-3">
+                    <span>热门话题</span>
+                    <span class="hover-opacity">更多&nbsp;></span>
+                </div>
+                <div class="ps-4 py-1 hover-item-grey d-flex" v-for="(item, index) in hotTopics" :key="index">
+                    <img :src="item.sharePicUrl" width="38" height="38" class="rounded-2 object-fit-cover me-2" alt="" />
+                    <div>
+                        <div class="mb-1">#{{ item.title }}#</div>
+                        <div class="text-black-50">{{ item.participateCount }}人参与</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
 import { NavsProps } from "@/components/viewParts/HorizontalNav.vue";
-import { defineComponent, reactive, toRefs, watch } from "vue";
+import { computed, ComputedRef, defineComponent, reactive, toRefs, watch } from "vue";
 import { getEventApi } from "@/api/common";
 import { mapEventName, YYYYMMDD } from "@/hooks/useFilters";
 import { useStore } from "vuex";
+import { getHotTopicApi } from "@/api/common";
 interface FriendsProps {
     navs: NavsProps[];
     events: object;
+    loginStatus: ComputedRef;
+    hotTopics: object[];
 }
 export default defineComponent({
     setup() {
+        const store = useStore();
         const state = reactive<FriendsProps>({
             navs: [
                 {
@@ -83,23 +111,40 @@ export default defineComponent({
                 },
             ],
             events: {},
+            loginStatus: computed(() => store.getters.getLoginStatus),
+            hotTopics: [],
         });
-        const getUserEvent = () => {
+        watch(
+            () => state.loginStatus,
+            newV => {
+                initPageData();
+            }
+        );
+        const initPageData = () => {
             getEventApi().then((res: any) => {
                 if (res.code === 200) {
                     state.events = res.event.map(item => ({
                         ...item,
                         jsonActive:
-                            JSON.parse(item.json).msg && JSON.parse(item.json)?.msg.match(/(?<=#).+(?=#)/).length
+                            JSON.parse(item.json).msg && JSON.parse(item.json)?.msg.match(/(?<=#).+(?=#)/)?.length
                                 ? `#${JSON.parse(item.json)?.msg.match(/(?<=#).+(?=#)/)}#`
                                 : "",
                         jsonNormal:
                             item.json && JSON.parse(item.json).msg ? JSON.parse(item.json).msg.split("#")[item.json.split("#").length - 1] : "",
                     }));
+                }else{
+                    state.events = [];
+                }
+            });
+            getHotTopicApi().then((res: any) => {
+                if (res.code === 200) {
+                    state.hotTopics = res.hot;
+                }else{
+                    state.hotTopics = [];
                 }
             });
         };
-        getUserEvent();
+        initPageData();
         return {
             ...toRefs(state),
             mapEventName,
@@ -116,6 +161,9 @@ export default defineComponent({
     overflow-y: scroll;
     .eventContent {
         min-width: 800px;
+        .noEvents{
+            margin-top: 80px;
+        }
         .eventItem {
             .richText {
                 white-space: pre-wrap;
@@ -132,6 +180,9 @@ export default defineComponent({
     .rightEvent {
         width: 235px;
         height: 520px;
+        .loginBtn {
+            padding: 7px 0;
+        }
     }
 }
 </style>

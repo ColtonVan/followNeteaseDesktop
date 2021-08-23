@@ -20,3 +20,9 @@ export const getCountriesCodeListApi = () => {
 export const getIntelligenceListApi = (params: { id: number; pid: number; sid?: number }) => {
     return axiosIns.get("/playmode/intelligence/list", { params });
 };
+// limit: 取出评论数量 , 默认为 20
+
+// offset: 偏移数量 , 用于分页 , 如 :( 评论页数 -1)*20, 其中 20 为 limit 的值
+export const getHotTopicApi = (params: { limit: number; offset: number } = { limit: 5, offset: -1 }) => {
+    return axiosIns.get("/hot/topic", { params });
+};

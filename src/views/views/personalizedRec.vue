@@ -27,11 +27,12 @@
             v-for="(banner, bannerIndex) in banners"
             :key="bannerIndex"
             @click="
+                handleBannerRoute(banner, bannerIndex);
                 bannerIndex === getSecondBanerIndex
                     ? (currentActiveIndex = getSecondBanerIndex)
                     : bannerIndex === getLastBannerIndex
                     ? (currentActiveIndex = getLastBannerIndex)
-                    : false
+                    : false;
             "
         ></div>
     </div>
@@ -67,7 +68,10 @@
                     </div>
                     <CalendarIcon width="100%" height="100%" />
                 </div>
-                <div class="position-absolute rounded-circle hover-play justify-content-center align-items-center">
+                <div
+                    @click.stop="$router.push({ path: '/container/dailyRec', query: { immediate: true } })"
+                    class="position-absolute rounded-circle hover-play justify-content-center align-items-center"
+                >
                     <div class="trigonalPlay"></div>
                 </div>
             </div>
@@ -102,8 +106,13 @@
 import { computed, defineComponent, reactive, toRefs } from "vue";
 import { getBanners, getPersonalizedApi } from "@/api/discover";
 import { playCount } from "@/hooks/useFilters";
+import { useRouter } from "vue-router";
+import { useStore } from "vuex";
+import { getSongDetailApi } from "@/api/song";
 export default defineComponent({
     setup() {
+        const router = useRouter();
+        const store = useStore();
         const state = reactive({
             banners: [],
             personalizedList: [],
@@ -113,7 +122,7 @@ export default defineComponent({
         //获取轮播
         const getBanners_com = () => {
             return new Promise((resolve, reject) => {
-                getBanners().then((res: any) => {
+                getBanners({ type: 0 }).then((res: any) => {
                     if (res.code === 200) {
                         state.banners = res.banners;
                         resolve(res.banners);
@@ -179,6 +188,23 @@ export default defineComponent({
         const mouseenterSwiperDot = dotIndex => {
             state.currentActiveIndex = dotIndex;
         };
+        const handleBannerRoute = (banner, bannerIndex) => {
+            if (bannerIndex === state.currentActiveIndex) {
+                switch (banner.targetType) {
+                    case 1:
+                        getSongDetailApi([banner.targetId]).then((res: any) => {
+                            if (res.code === 200 && res.songs?.length) {
+                                store.commit("changeCurrentMusicDetail", res.songs[0]);
+                                store.dispatch("getCurrentMusicUrlInfo", { id: banner.targetId });
+                            }
+                        });
+                        break;
+                    case 10:
+                        // router.push({ path: "/container/createdMusicList", query: { id: banner.targetId } });
+                        break;
+                }
+            }
+        };
         return {
             ...toRefs(state),
             getLastBannerIndex,
@@ -188,6 +214,7 @@ export default defineComponent({
             continueSwiper,
             mouseenterSwiperDot,
             playCount,
+            handleBannerRoute,
         };
     },
 });
